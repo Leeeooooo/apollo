@@ -11,4 +11,18 @@
 
 --use_navigation_mode=false
 
---map_dir=/apollo/modules/map/data/sunnyvale_big_loop
+##yandong added on NOv 26 for calibration
+
+--localization_tf2_child_frame_id=novatel
+
+--pointcloud_raw_topic=/apollo/sensor/velodyne16/PointCloud2
+
+--velodyne_raw_topic=/apollo/sensor/velodyne16/VelodyneScanUnified
+
+--pointcloud_topic=/apollo/sensor/velodyne16/compensator/PointCloud2
+
+--lidar_extrinsics_file=modules/localization/msf/params/velodyne_params/velodyne16_novatel_extrinsics_example.yaml
+
+--lidar_height_file=modules/localization/msf/params/velodyne_params/velodyne16_height.yaml
+
+--half_vehicle_width=0.43
