@@ -19,7 +19,7 @@ em_planner_config {
         eval_time_interval: 0.1
         path_resolution: 1.0
         obstacle_ignore_distance: 20.0
-        obstacle_collision_distance: 0.5
+        obstacle_collision_distance: 1.0
         obstacle_risk_distance: 2.0
         obstacle_collision_cost: 1e8
         path_l_cost: 6.5
@@ -35,7 +35,7 @@ em_planner_config {
     }
     dp_st_speed_config {
         total_path_length: 149
-        total_time: 7.0
+        total_time: 15.0
         matrix_dimension_s: 150
         matrix_dimension_t: 8
 
@@ -60,7 +60,7 @@ em_planner_config {
         positive_jerk_coeff: 1.0
         negative_jerk_coeff: 1.0
 
-        max_acceleration: 3.0
+        max_acceleration: 0.5
         max_deceleration: -4.0
 
         st_boundary_config {
@@ -69,9 +69,10 @@ em_planner_config {
             low_speed_centric_acceleration_limit: 1.2
             high_speed_threshold: 12.58
             low_speed_threshold: 7.5
-            minimal_kappa: 0.00001
+          minimal_kappa: 0.00001
+
             point_extension: 1.0
-            lowest_speed: 2.5
+            lowest_speed: 0.5
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
@@ -101,9 +102,9 @@ em_planner_config {
     qp_st_speed_config {
         total_path_length: 250.0
         total_time: 7.0
-        preferred_max_acceleration: 2.5
+        preferred_max_acceleration: 0.5
         preferred_min_deceleration: -3.3
-        max_acceleration: 3.0
+        max_acceleration: 0.5
         min_deceleration: -4.0
 
         qp_spline_config {
@@ -140,7 +141,7 @@ em_planner_config {
             low_speed_threshold: 7.5
             minimal_kappa: 0.00001
             point_extension: 1.0
-            lowest_speed: 2.5
+            lowest_speed: 0.5
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
@@ -151,9 +152,9 @@ em_planner_config {
         total_path_length: 250.0
         total_time: 8.0
 
-        preferred_accel: 2.5
+        preferred_accel: 0.5
         preferred_decel: -3.3
-        max_accel: 2.5
+        max_accel: 0.5
         min_decel: -4.5
 
         speed_limit_buffer: 0.05
@@ -171,7 +172,7 @@ em_planner_config {
             low_speed_threshold: 4.5
             minimal_kappa: 0.00001
             point_extension: 1.0
-            lowest_speed: 2.5
+            lowest_speed: 0.5
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
