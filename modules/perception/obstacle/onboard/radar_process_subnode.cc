@@ -132,6 +132,9 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   }
   ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
          << " num_raw_obstacles: " << radar_obs_proto.contiobs_size() << "]";
+  for(int it = 0; it < radar_obs_proto.contiobs_size(); it++){
+	  ADEBUG << "id: " <<radar_obs_proto.contiobs(it).obstacle_id() << "position: x: " <<  radar_obs_proto.contiobs(it).longitude_dist() << " y: " << radar_obs_proto.contiobs(it).lateral_dist() << " class: " << radar_obs_proto.contiobs(it).obstacle_class();
+  }
 
   // 1. get radar pose
   std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();

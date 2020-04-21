@@ -37,6 +37,7 @@ using pcl_util::Point;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 using std::vector;
+using apollo::common::adapter::AdapterManager;
 
 class LidarProcessTest : public testing::Test {
  protected:
@@ -75,8 +76,8 @@ TEST_F(LidarProcessTest, test_Init) {
 
 TEST_F(LidarProcessTest, test_Process) {
   std::string pcd_file =
-      "modules/perception/data/hm_tracker_test/"
-      "QN68P2_12_1476265365_1476265665_2.pcd";
+      "msf/2020-03-02-14-24-50/pcd/"
+      "1.pcd";
   PointCloudPtr point_cloud(new PointCloud);
   pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
       new pcl::PointCloud<pcl_util::PointXYZIT>);
@@ -95,8 +96,11 @@ TEST_F(LidarProcessTest, test_Process) {
   (*velodyne_trans) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   lidar_process_.hdmap_input_ = HDMapInput::instance();
   EXPECT_TRUE(lidar_process_.Process(123.0, point_cloud, velodyne_trans));
+PerceptionObstacles obstacles;
+  lidar_process_.GeneratePbMsg(&obstacles);
+AdapterManager::PublishPerceptionObstacles(obstacles);
 }
-
+/*
 TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   double timestamp = 1234.567;
   lidar_process_.timestamp_ = timestamp;
@@ -117,6 +121,6 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   EXPECT_EQ(obstacles.perception_obstacle(1).type(),
             PerceptionObstacle::PEDESTRIAN);
 }
-
+*/
 }  // namespace perception
 }  // namespace apollo

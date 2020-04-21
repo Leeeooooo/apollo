@@ -24,6 +24,9 @@
 #include "Eigen/Core"
 #include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "ros/include/ros/ros.h"
+#include "ros/include/jsk_recognition_msgs/BoundingBox.h"
+#include "ros/include/jsk_recognition_msgs/BoundingBoxArray.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -90,6 +93,12 @@ class LidarProcessSubnode : public Subnode {
   std::unique_ptr<BaseTracker> tracker_;
   std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;
+
+ //增加节点
+  ros::Publisher roi_cloud_pub_;
+  ros::Publisher pub_bounding_boxs_;
+  jsk_recognition_msgs::BoundingBox bounding_box_;
+  jsk_recognition_msgs::BoundingBoxArray bbox_array;
 };
 
 class Lidar64ProcessSubnode : public LidarProcessSubnode {

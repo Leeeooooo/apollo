@@ -15,12 +15,14 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
-
+#include <stdio.h>
 #include <unordered_map>
-
+#include "Eigen/Geometry"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
+#include "Eigen/Core"
+#include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
@@ -48,7 +50,8 @@ using pcl_util::PointCloudPtr;
 using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-
+using Eigen::AngleAxisd;
+using Eigen::Vector3d;
 bool LidarProcessSubnode::InitInternal() {
   if (inited_) {
     return true;
@@ -78,6 +81,13 @@ bool LidarProcessSubnode::InitInternal() {
   }
   device_id_ = reserve_field_map["device_id"];
   AddMessageCallback();
+
+//初始化新增节点
+  ros::NodeHandle nh;
+  roi_cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>
+                                  ("/apollo/sensor/velodyne/roi/PointCloud2", 10);
+  pub_bounding_boxs_ = nh.advertise<jsk_recognition_msgs::BoundingBoxArray>
+                                  ("/apollo/perception/detected_bounding_boxs", 10);
 
   inited_ = true;
 
@@ -156,6 +166,13 @@ void LidarProcessSubnode::OnPointCloud(
       return;
     }
   }
+
+//发布ROI点云
+      sensor_msgs::PointCloud2 output;
+      pcl::toROSMsg(*roi_cloud, output);
+      output.header.frame_id = "velodyne16";
+      roi_cloud_pub_.publish(output);
+    //
   ADEBUG << "call roi_filter succ. The num of roi_cloud is: "
          << roi_cloud->points.size();
   PERF_BLOCK_END("lidar_roi_filter");
@@ -210,6 +227,35 @@ void LidarProcessSubnode::OnPointCloud(
       return;
     }
   }
+
+//发布障碍物
+    bbox_array.header = output.header;
+    for(int i = 0;i < static_cast<int>(objects.size());i++){
+      bounding_box_.header = output.header;
+      bounding_box_.pose.position.x = objects[i]->center(0);
+      bounding_box_.pose.position.y = objects[i]->center(1);
+      bounding_box_.pose.position.z = objects[i]->center(2)+(objects[i]->height)/2;
+
+      Eigen::AngleAxisd rollAngle(AngleAxisd(objects[i]->direction(2),Vector3d::UnitX()));
+      Eigen::AngleAxisd pitchAngle(AngleAxisd(objects[i]->direction(1),Vector3d::UnitY()));
+      Eigen::AngleAxisd yawAngle(AngleAxisd(objects[i]->direction(0),Vector3d::UnitZ()));
+ 
+      Eigen::Quaterniond quaternion;
+      quaternion = yawAngle * pitchAngle * rollAngle;
+
+      bounding_box_.pose.orientation.x = quaternion.x();
+      bounding_box_.pose.orientation.y = quaternion.y();
+      bounding_box_.pose.orientation.z = quaternion.z();
+      bounding_box_.pose.orientation.w = quaternion.w();
+
+      bounding_box_.dimensions.x = objects[i]->length;
+      bounding_box_.dimensions.y = objects[i]->width;
+      bounding_box_.dimensions.z = objects[i]->height;
+
+      bbox_array.boxes.push_back(bounding_box_);
+    }
+    pub_bounding_boxs_.publish(bbox_array); 
+    bbox_array.boxes.clear();
   ADEBUG << "call object_builder succ.";
   PERF_BLOCK_END("lidar_object_builder");
 
