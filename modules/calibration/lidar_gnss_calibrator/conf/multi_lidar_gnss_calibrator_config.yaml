@@ -1,0 +1,32 @@
+# multi-LiDAR-GNSS calibration configurations
+data:
+    odometry: "/apollo/data/bag/calibration/export/multi_lidar_gnss/_apollo_sensor_gnss_odometry/odometry"
+    lidars: 
+        - velodyne16: 
+            path: "/apollo/data/bag/calibration/export/multi_lidar_gnss/_apollo_sensor_velodyne16_PointCloud2/"
+    result: "/apollo/data/bag/calibration/export/multi_lidar_gnss/result/"
+calibration:
+    init_extrinsics:
+        velodyne16:
+            translation:    
+                x: 0.0
+                y: 0.395
+                z: 1.075
+            rotation:
+                x: 0
+                y: 0
+                z: 0.7071068
+                w: 0.7071068
+    steps: 
+        - source_lidars: ["velodyne16"]
+          target_lidars: ["velodyne16"]
+          lidar_type: "multiple"
+          fix_target_lidars: false
+          fix_z: true
+          iteration: 3
+        - source_lidars: ["velodyne16"]
+          target_lidars: ["velodyne16"]
+          lidar_type: "multiple"
+          fix_target_lidars: false
+          fix_z: true
+          iteration: 3

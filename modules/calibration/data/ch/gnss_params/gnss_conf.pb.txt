@@ -9,11 +9,11 @@ data {
 rtk_from {
     format: RTCM_V3
     ntrip {
-        address: "<IP>"
-        port: <PORT>
-        mount_point: "<MOUNTPOINT>"
-        user: "<USER>"
-        password: "<PASSWORD>"
+        address: "112.34.112.154"
+        port: 8000
+        mount_point: "NCJLXL"
+        user: "user"
+        password: "password"
         timeout_s: 5
     }
     push_location: true

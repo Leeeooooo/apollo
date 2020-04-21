@@ -2,5 +2,5 @@ name : "CH"
 brand : CH
 model : CH
 license {
-    vin : "<VIN>"
+    vin : "2019044"
 }

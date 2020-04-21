@@ -1,0 +1,8 @@
+bag_path: "/apollo/data/bag/calibration/"
+dump_dir: "/apollo/data/bag/calibration/export/"
+topics:
+    - /apollo/sensor/gnss/odometry:
+        type: ApolloOdometry
+    - /apollo/sensor/velodyne16/PointCloud2:
+        type: PointCloud2
+
