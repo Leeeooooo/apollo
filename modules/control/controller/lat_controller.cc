@@ -531,7 +531,7 @@ void LatController::UpdateMatrixCompound() {
 
 double LatController::ComputeFeedForward(double ref_curvature) const {
   const double kv =
-      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
+      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 1 / cr_ / wheelbase_;
 
   // then change it from rad to %
   const double v = VehicleStateProvider::instance()->linear_velocity();
@@ -539,7 +539,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
       (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
        matrix_k_(0, 2) *
            (lr_ * ref_curvature -
-            lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
+            lf_ * mass_ * v * v * ref_curvature / 1 / cr_ / wheelbase_)) *
       180 / M_PI * steer_transmission_ratio_ /
       steer_single_direction_max_degree_ * 100;
   return steer_angle_feedforwardterm;
