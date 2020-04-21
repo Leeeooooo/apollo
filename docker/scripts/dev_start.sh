@@ -184,6 +184,7 @@ function local_volumes() {
         Linux)
             volumes="${volumes} -v /dev:/dev \
                                 -v /media:/media \
+				-v /home/tmp/ros:/home/tmp/ros \
                                 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                                 -v /etc/localtime:/etc/localtime:ro \
                                 -v /usr/src:/usr/src \
@@ -203,7 +204,7 @@ function main(){
         info "Start docker container based on local image : $IMG"
     else
         info "Start pulling docker image $IMG ..."
-        docker pull $IMG
+        #docker pull $IMG
         if [ $? -ne 0 ];then
             error "Failed to pull docker image."
             exit 1
@@ -246,14 +247,14 @@ function main(){
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
     LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-    docker pull ${LOCALIZATION_VOLUME_IMAGE}
+    #docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
     YOLO3D_VOLUME=apollo_yolo3d_volume
     docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
 
     YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
-    docker pull ${YOLO3D_VOLUME_IMAGE}
+    #docker pull ${YOLO3D_VOLUME_IMAGE}
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
     info "Starting docker container \"apollo_dev\" ..."

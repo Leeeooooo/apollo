@@ -93,7 +93,17 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //...`
+    if [ "$1" ] ; then
+        BUILD_TARGETS=`bazel query $(echo "//modules/$1/...")`
+        if [ $? -ne 0 ]; then
+          ISFAIL=1
+        fi
+        shift
+    else BUILD_TARGETS=`bazel query //...`
+        if [ $? -ne 0 ]; then
+          ISFAIL=1
+        fi
+    fi
   else
     info 'Skip building perception module!'
     BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
@@ -117,7 +127,6 @@ function generate_build_targets() {
 
 function build() {
   info "Start building, please wait ..."
-  generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
   MACHINE_ARCH=$(uname -m)
@@ -125,13 +134,15 @@ function build() {
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
-  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+
+  generate_build_targets $1
+  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $BUILD_CMD
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
 
   # Build python proto
-  build_py_proto
+  build_py_proto $1
 
   # Clear KV DB and update commit_id after compiling.
   rm -fr data/kv_db
@@ -171,22 +182,49 @@ function cibuild() {
 }
 
 function apollo_build_dbg() {
-  build "dbg" $@
+  BUILD_CMD="dbg"
+  build $@
 }
 
 function apollo_build_opt() {
-  build "opt" $@
+  BUILD_CMD="opt"
+  build $@
 }
 
 function build_py_proto() {
-  if [ -d "./py_proto" ];then
-    rm -rf py_proto
+#  if [ -d "./py_proto" ];then
+#    rm -rf py_proto
+#  fi
+  if [ ! -d "./py_proto"  ] ; then
+    mkdir py_proto
   fi
-  mkdir py_proto
-  PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
-  find modules/ -name "*.proto" \
-      | grep -v node_modules \
-      | xargs ${PROTOC} --python_out=py_proto
+
+  if [ -e './bazel-out/host/bin/external/com_github_google_protobuf/protoc' ]; then
+    PROTOC='./bazel-out/host/bin/external/com_github_google_protobuf/protoc'
+  else
+  PROTOC='protoc'
+  fi
+
+  if [ "$1" ] ; then
+    find modules/common -name "*.proto" \
+        | grep -v node_modules \
+        | xargs ${PROTOC} --python_out=py_proto
+    if [ -d "modules/$1"  ] ; then
+      find modules/$1 -name "*.proto" \
+          | grep -v node_modules \
+          | xargs ${PROTOC} --python_out=py_proto
+    fi
+    if [ -d "modules/drivers/$1"  ] ; then
+      find modules/drivers/$1 -name "*.proto" \
+          | grep -v node_modules \
+          | xargs ${PROTOC} --python_out=py_proto
+    fi
+  else
+    find modules/ -name "*.proto" \
+        | grep -v node_modules \
+        | xargs ${PROTOC} --python_out=py_proto
+  fi
+
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
@@ -262,9 +300,6 @@ function release() {
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
 
-  # remove mounted models
-  rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
-
   # lib
   LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
   mkdir "${LIB_DIR}"
@@ -277,6 +312,7 @@ function release() {
   cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
+  cp -r docs "${APOLLO_RELEASE_DIR}"
   cp LICENSE "${APOLLO_RELEASE_DIR}"
   cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
 
@@ -448,30 +484,6 @@ function build_velodyne() {
   rm -rf modules/devel_isolated/
 }
 
-function build_velodyne_vls128() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/velodyne_vls \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
-
 
 function build_lslidar() {
   CURRENT_PATH=$(pwd)
@@ -557,11 +569,11 @@ function print_usage() {
   .${BOLD}/apollo.sh${NONE} [OPTION]"
 
   echo -e "\n${RED}Options${NONE}:
-  ${BLUE}build${NONE}: run build only
+  ${BLUE}build [module_name]${NONE}: run build for all modules or specified module.
+  ${BLUE}build_py [module_name]${NONE}: run build proto to proto.py for all modules or specified module.
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
-  ${BLUE}build_velodyne_vls128${NONE}: build velodyne vls-128 driver
   ${BLUE}build_lslidar${NONE}: build lslidar driver
   ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
@@ -645,14 +657,14 @@ function main() {
     buildify)
       buildify
       ;;
+    build_gnss)
+      build_gnss
+      ;;
     build_py)
-      build_py_proto
+      build_py_proto $@
       ;;
     build_velodyne)
       build_velodyne
-      ;;
-    build_velodyne_vls128)
-      build_velodyne_vls128
       ;;
     build_lslidar)
       build_lslidar
