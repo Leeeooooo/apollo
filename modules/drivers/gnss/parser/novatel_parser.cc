@@ -317,8 +317,11 @@ Parser::MessageType NovatelParser::PrepareMessage(MessagePtr* message_ptr) {
     message_id = header->message_id;
     message_length = header->message_length;
   }
+
+  AINFO << "message_id is:" << message_id;
   switch (message_id) {
     case novatel::BESTGNSSPOS:
+    AINFO <<"receive a new BESTGNSSPOS message, its id is: " <<novatel::MessageId::BESTGNSSPOS;
       if (message_length != sizeof(novatel::BestPos)) {
         AERROR << "Incorrect message_length";
         break;

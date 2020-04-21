@@ -454,7 +454,10 @@ void RawStream::DataSpin() {
                                          &stream_status_);
   AdapterManager::PublishStreamStatus(stream_status_);
   while (ros::ok()) {
+    
+    AINFO <<"Before raw_data parse ,the data_stream status is:" << static_cast<int>(data_stream_->get_status());
     size_t length = data_stream_->read(buffer_, BUFFER_SIZE);
+    AINFO <<"data_stream has readed the gnss raw_data length is: " <<length;  //添加打印串口是否传输出原始数据
     if (length > 0) {
       std_msgs::StringPtr msg_pub(new std_msgs::String);
       if (!msg_pub) {
@@ -464,6 +467,8 @@ void RawStream::DataSpin() {
       msg_pub->data.assign(reinterpret_cast<const char *>(buffer_), length);
       AdapterManager::PublishGnssRawData(*msg_pub);  // for data recorder
       data_parser_ptr_->ParseRawData(msg_pub);
+
+    AINFO <<"After raw_data parse ,the data_stream status is:" <<static_cast<int>(data_stream_->get_status());
       if (push_location_) {
         PushGpgga(length);
       }
@@ -477,7 +482,11 @@ void RawStream::RtkSpin() {
     return;
   }
   while (ros::ok()) {
+
+    AINFO <<"Before RtkData publish and parse ,in_rtk_stream status is:" <<static_cast<int>(in_rtk_stream_->get_status());
     size_t length = in_rtk_stream_->read(buffer_rtk_, BUFFER_SIZE);
+    AINFO <<"in_rtk_stream has readed the gnss RtkData length is: " <<length;
+
     if (length > 0) {
       if (rtk_software_solution_) {
         PublishRtkData(length);
@@ -486,6 +495,8 @@ void RawStream::RtkSpin() {
         if (out_rtk_stream_ == nullptr) {
           continue;
         }
+
+        AINFO <<"After RtkData publish and parse ,out_rtk_stream status is:" <<static_cast<int>(out_rtk_stream_->get_status());
         size_t ret = out_rtk_stream_->write(buffer_rtk_, length);
         if (ret != length) {
           AERROR << "Expect write out rtk stream bytes " << length
