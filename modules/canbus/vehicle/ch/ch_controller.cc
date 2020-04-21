@@ -476,6 +476,7 @@ void ChController::SecurityDogThreadFunc() {
         CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
+	AERROR << "horizontal_ctrl_fail";
         emergency_mode = true;
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
@@ -489,6 +490,7 @@ void ChController::SecurityDogThreadFunc() {
         CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
+	AERROR << "vertical_ctrl_fail";
         emergency_mode = true;
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
@@ -497,6 +499,7 @@ void ChController::SecurityDogThreadFunc() {
     }
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
+      AERROR << "check chassis error";
       emergency_mode = true;
     }
 
