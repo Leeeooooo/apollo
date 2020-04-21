@@ -205,11 +205,23 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   LocalizationEstimate lidar_localization;
 
   state = lidar_process_->GetResult(&lidar_localization);
-
+  AINFO <<"Current Lidar localization state is :" <<state;
   MeasureData lidar_measure;
   if (state == 2) {  // only state OK republish lidar msg
     republish_process_->LidarLocalProcess(lidar_localization, &lidar_measure);
     integ_process_->MeasureDataProcess(lidar_measure);
+    
+    if (debug_log_flag_) {
+    AINFO << std::setprecision(16)
+          << "MeasureDataRepublish Tranfer utm coordinate Debug Log: local lidar msg: "
+          << "[time:" << lidar_localization.header().timestamp_sec() << "]"
+          << "[x:" << lidar_localization.pose().position().x() << "]"
+          << "[y:" << lidar_localization.pose().position().y() << "]"
+          << "[z:" << lidar_localization.pose().position().z() << "]"
+          << "[std_x:" << lidar_localization.uncertainty().position_std_dev().x() << "]"
+          << "[std_y:" << lidar_localization.uncertainty().position_std_dev().y() << "]"
+          << "[std_z:" << lidar_localization.uncertainty().position_std_dev().z() << "]";
+  } 
 
     imu_altitude_from_lidar_localization_ =
         lidar_localization.pose().position().z();
@@ -288,6 +300,18 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   if (imu_altitude_from_lidar_localization_available_) {
     apollo::common::PointENU* position = posepb_loc->mutable_position();
     position->set_z(imu_altitude_from_lidar_localization_);
+  }
+  
+  if (debug_log_flag_) {
+    AINFO << std::setprecision(16)
+          << "MeasureDataRepublish Tranfer utm coordinate Debug Log: integ_localization msg: "
+          << "[time:" << integ_localization.header().timestamp_sec() << "]"
+          << "[x:" << integ_localization.pose().position().x() << "]"
+          << "[y:" << integ_localization.pose().position().y() << "]"
+          << "[z:" << integ_localization.pose().position().z() << "]"
+          << "[std_x:" << integ_localization.uncertainty().position_std_dev().x() << "]"
+          << "[std_y:" << integ_localization.uncertainty().position_std_dev().y() << "]"
+          << "[std_z:" << integ_localization.uncertainty().position_std_dev().z() << "]";
   }
 
   // set linear acceleration
@@ -512,6 +536,7 @@ void LocalizationIntegImpl::RawObservationProcessImpl(
 
   LocalizationEstimate gnss_localization;
   TransferGnssMeasureToLocalization(measure, &gnss_localization);
+  
 
   gnss_localization_mutex_.lock();
   gnss_localization_list_.push_back(
@@ -538,7 +563,17 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 
     LocalizationEstimate gnss_localization;
     TransferGnssMeasureToLocalization(measure, &gnss_localization);
-
+    if (debug_log_flag_) {
+    AINFO << std::setprecision(16)
+          << "MeasureDataRepublish Tranfer utm coordinate Debug Log: bestgnsspos msg: "
+          << "[time:" << gnss_localization.header().timestamp_sec() << "]"
+          << "[x:" << gnss_localization.pose().position().x() << "]"
+          << "[y:" << gnss_localization.pose().position().y() << "]"
+          << "[z:" << gnss_localization.pose().position().z() << "]"
+          << "[std_x:" << gnss_localization.uncertainty().position_std_dev().x() << "]"
+          << "[std_y:" << gnss_localization.uncertainty().position_std_dev().y() << "]"
+          << "[std_z:" << gnss_localization.uncertainty().position_std_dev().z() << "]";
+  }
     gnss_localization_mutex_.lock();
     gnss_localization_list_.push_back(
         LocalizationResult(LocalizationMeasureState::OK, gnss_localization));

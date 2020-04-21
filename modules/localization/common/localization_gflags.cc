@@ -38,7 +38,18 @@ DEFINE_string(msf_visual_adapter_config_file,
               "modules/localization/conf/msf_visual_adapter.conf",
               "msf visualization adapter configuration");
 
+DEFINE_string(localization_msf_gnss_filename,
+              "modules/localization/data/msf_gnss/",
+               "save localizaton msf gnss data");
+DEFINE_string(localization_msf_lidar_filename,
+              "modules/localization/data/msf_lidar/",
+              "save localizaton msf lidar data");
+DEFINE_string(localization_pose_filename,
+              "modules/localization/data/pose/",
+              "save localizaton pose data");
+
 // features
+DEFINE_bool(enable_csv_log, true, "True to write out csv debug file.");
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
 DEFINE_bool(enable_map_reference_unify, true,
             "enable IMU data convert to map reference");

@@ -108,8 +108,10 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
 
   if (sins_->IsSinsAligned()) {
     integ_state_ = IntegState::NOT_STABLE;
+    //AINFO <<"integ sins delay_output_counter_ numbers: "<<delay_output_counter_;
     if (delay_output_counter_ < 3000) {
       ++delay_output_counter_;
+
     } else {
       integ_state_ = IntegState::OK;
       GetValidFromOK();
@@ -310,8 +312,9 @@ void LocalizationIntegProcess::MeasureDataProcessImpl(
   }
 
   sins_->AddMeasurement(measure_msg);
-
-  timer.End("time of integrated navigation measure update");
+  
+  AINFO <<"time of integrated navigation measure update!";
+  //timer.End("time of integrated navigation measure update");
   return;
 }
 
@@ -321,27 +324,27 @@ bool LocalizationIntegProcess::CheckIntegMeasureData(
     AERROR << "receive a new odometry measurement!!!\n";
   }
 
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-              << "IntegratedLocalization Debug Log: measure data: "
-              << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
-              << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
-              << "]"
-              << "[z:" << measure_data.gnss_pos.height << "]"
-              << "[ve:" << measure_data.gnss_vel.ve << "]"
-              << "[vn:" << measure_data.gnss_vel.vn << "]"
-              << "[vu:" << measure_data.gnss_vel.vu << "]"
-              << "[pitch:" << measure_data.gnss_att.pitch * 57.295779513082323
-              << "]"
-              << "[roll:" << measure_data.gnss_att.roll * 57.295779513082323
-              << "]"
-              << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
-              << "]"
-              << "[measure type:" << int(measure_data.measure_type) << "]";
-  }
-
+  //if (debug_log_flag_) {
+    //AINFO << std::setprecision(16)
+      //        << "IntegratedLocalization Debug Log: measure data: "
+        //      << "[time:" << measure_data.time << "]"
+          //    << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
+            //  << "]"
+              //<< "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
+            //  << "]"
+            //  << "[z:" << measure_data.gnss_pos.height << "]"
+            //  << "[ve:" << measure_data.gnss_vel.ve << "]"
+            //  << "[vn:" << measure_data.gnss_vel.vn << "]"
+            //  << "[vu:" << measure_data.gnss_vel.vu << "]"
+            //  << "[pitch:" << measure_data.gnss_att.pitch * 57.295779513082323
+            //  << "]"
+            //  << "[roll:" << measure_data.gnss_att.roll * 57.295779513082323
+            //  << "]"
+            //  << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
+            //  << "]"
+            //  << "[measure type:" << int(measure_data.measure_type) << "]";
+ // }
+  AINFO << "Receive a new MeasureData, and IntegMeasureData is checked no problem! ";
   return true;
 }
 

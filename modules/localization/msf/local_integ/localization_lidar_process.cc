@@ -197,7 +197,7 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
 
   int ret = locator_->Update(pcd_index++, cur_predict_location_, velocity_,
                              lidar_frame);
-
+  AINFO << "lidar computer result is: " << ret;
   UpdateState(ret, lidar_frame.measurement_time);
 
   timer.End("Lidar process");
@@ -363,6 +363,7 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
         --out_map_count_;
       }
     }
+    AINFO <<"After localoition lidar computer,localizationlidar unstable_count and out_map count: " <<unstable_count_ <<"," <<out_map_count_;
     pre_location_ = location_;
     pre_location_time_ = time;
 
@@ -371,6 +372,7 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
     lidar_status_ = LidarState::NOT_STABLE;
     pre_location_ = location_;
     pre_location_time_ = time;
+    AINFO <<"localizationlidar out_map_count: "<<out_map_count_;
     if (out_map_count_ < 10) {
       ++out_map_count_;
     } else {

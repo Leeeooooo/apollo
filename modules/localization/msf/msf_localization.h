@@ -26,7 +26,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#include <fstream>
 #include "gtest/gtest_prod.h"
 
 #include "ros/include/ros/ros.h"
@@ -61,7 +61,7 @@ namespace localization {
 class MSFLocalization : public LocalizationBase {
  public:
   MSFLocalization();
-
+  virtual ~MSFLocalization();
   /**
    * @brief module start function
    * @return start status
@@ -73,9 +73,11 @@ class MSFLocalization : public LocalizationBase {
    * @return stop status
    */
   apollo::common::Status Stop() override;
+  //void SaveLocalizationFile(const std::string& filename, LocalizationEstimate &local_result);
 
  private:
   apollo::common::Status Init();
+  void CloseLogFile();
   void InitParams();
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
   void OnRawImu(const drivers::gnss::Imu &imu_msg);
@@ -108,6 +110,9 @@ class MSFLocalization : public LocalizationBase {
 
   // rotation from the vehicle coord to imu coord
   Eigen::Quaternion<double> imu_vehicle_quat_;
+  std::ofstream msf_gnss_log_file_;
+  std::ofstream msf_lidar_log_file_;
+  std::ofstream pose_log_file_;
 };
 
 }  // namespace localization
