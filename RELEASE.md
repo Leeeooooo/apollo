@@ -1,82 +1,254 @@
-# Release 3.0
+![image alt text](docs/demo_guide/images/Apollo_logo.png)
 
-Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a closed venue setting at a low speed. Automakers can now leverage this one stop solution for autonomous driving without having to customize on their own.
+[![Build Status](https://travis-ci.org/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.org/ApolloAuto/apollo) [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/dailybuild)
 
-## Major Features And Improvements
-* New Safety module called Guardian
-* Enhanced Surveillance module - Monitor 
-* Hardware service layer that will now act like a platform and not a product, giving developers the flexibility to integrate their own Hardware
-* Apollo Sensor Unit (ASU)
-* New Gatekeeper - Ultrasonic Sensor
-* Perception module changes:
-  * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
-  * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
-  * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
-  * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
-  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
-  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
-  * **16 beam LiDAR support**
+```
 
-# Release 2.5
-This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.
+We choose to go to the moon in this decade and do the other things,
 
-## Major Features And Improvements
-* Upgrade localization based on multiple sensor fusion (MSF)
-* Upgrade DreamView with more visualization features
-* Add HD map data collection tool
-* Add vision based perception with obstacle and lane mark detections
-* Add relative map to support ACC and lane keeping for planning and control
-* Make dockerfile available
+not because they are easy, but because they are hard.
 
-## Autonomous Drive Capabilities
-Vehicles with this version can drive autonomously on highways at higher speed with limited HD map support. The highway needs to have clear white painted lane marks with minimum curvatures. The performance of vision based perception will degrade significantly at night or with strong light flares. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. PLEASE TEST APOLLO 2.5 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM**.
+-- John F. Kennedy, 1962
 
-# Release 2.0
-This release supports that vehicles autonomously drive on simple urban roads. Vehicles are able to cruise and avoid collisions with obstacles, stop at traffic lights and change lanes if needed to reach the destination.
+```
 
-## Major Features And Improvements
-* Add traffic light detection
-* Add obstacle classification and support obstacle categories: _vehicle_, _pedestrian_, _cyclist_ and _unknown_
-* Upgrade planning capability to change lanes in order to reach the destination
-* Add point cloud based localization algorithm fusion with RTK
-* Add MPC based control algorithm
-* Add RNN model for traffic prediction
-* Integrate HMI and DreamView
-* Redesign DreamView and upgrade it with additional debugging visualization tools
-* Add additional debugging tools in `modules/tools`
-* Add release docker image upgrade through secure OTA
-* Add USB camera and radar driver support
+Welcome to Apollo's GitHub page!
 
-## Autonomous Driving Capabilities
-Vehicles with this version can drive autonomously on simple urban roads with light to medium traffic at slow to medium speed.
+[Apollo](http://apollo.auto) is a high performance, flexible architecture which accelerates the development, testing, and deployment of Autonomous Vehicles.
 
-# Release 1.5
-This release supports that vehicles autonomously cruise on fixed lanes.
+For business and partnership, please visit [our website](http://apollo.auto).
 
-## Major Features And Improvements
-* Add routing, perception, prediction, planning and end-to-end
-  * **_Perception_**: 3D point cloud based obstacle detection and tracking with GPU support
-  * **_Prediction_**: Deep neural network MLP prediction model and multiple predictors handling different categories of obstacles
-  * **_Planning_**: traffic law modules, multiple iterations of DP and QP optimizations for path and speed
-  * **_End-to-end_**: Mixed deep neural network models with convolutional LSTM in longitudinal and FCNN in lateral
-* Add HD Map engine APIs
-* Add Velodyne 64 LiDAR driver support
-* Add debugging tools in `modules/tools/`
-* Improve HMI and DreamView features to allow realtime traffic display and traffic scenario replay.
+## Table of Contents
 
-## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** detect traffic lights. Vehicles will **NOT** stop at red traffic lights. Neither will them change lanes on the road.
+1. [Getting Started](#getting-started)
+2. [Prerequisites](#prerequisites)
+    - [Basic Requirements](#basic-requirements)
+    - [Individual Version Requirements](#individual-version-requirements)
+3. [Architecture](#architecture)
+4. [Installation](#installation)
+5. [Documents](#documents)
 
-# Release 1.0
-Initial release of Apollo implements autonomous GPS waypoint following.
 
-## Major Features And Improvements
-* Include localization, control
-  * **_Location_**: RTK
-  * **_Control_**: calibration table in longitudinal and LQR in lateral
-* Add GPS/IMU gnss driver support
-* Use HMI to record and replay a trajectory, and DreamView to visualize vehicle trajectory
-* Include debugging tools in `modules/tools/`
 
-## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can them drive on public roads or areas without GPS signals.
+## Getting Started
+
+**The Apollo Team now proudly presents to you the latest [version 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md).**
+
+
+ Apollo 3.0 is loaded with new modules and features, but needs to be callibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+
+[Want to contribute to our code?](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md) follow this guide.
+
+## Prerequisites
+
+#### Basic Requirements:
+
+* Vehicle equipped with by-wire system, including but not limited to brake by-wire, steering by-wire, throttle by-wire and shift by-wire (Apollo is currently tested on Lincoln MKZ)
+
+* A machine with a 4-core processor and 6GB memory minimum
+
+* Ubuntu 14.04
+
+* Working knowledge of Docker
+
+
+ - Please note, it is recommended that you install the versions of Apollo in the following order: 
+ **1.0 > 1.5 > 2.0 > 2.5 > 3.0**.
+ The reason behind this recommendation is that you need to confirm whether individual hardware components 
+ and modules are functioning correctly and clear various version test cases,
+ before progressing to a higher more capable version for your safety and the safety of those around you.
+
+ - Please note, if you do not have a vehicle, proceed to the [Installation - Without Hardware](#without-hardware) 
+
+
+#### Individual Version Requirements:
+
+The following diagram highlights the scope and features of each Apollo release:
+
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/apollo_versions_3.png)
+
+[**Apollo 1.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
+
+Apollo 1.0 also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
+
+![image alt text](docs/demo_guide/images/Apollo_1.png)
+
+**For Setup:**
+
+* **Hardware**:
+
+    * Industrial PC (IPC)
+
+    * Global Positioning System (GPS)
+
+    * Inertial Measurement Unit (IMU)
+
+    * Controller Area Network (CAN) card
+
+    * Hard drive
+
+    * GPS Antenna
+
+    * GPS Receiver
+
+* **Software**:
+
+    * Apollo Linux Kernel (based on Linux Kernel 4.4.32)
+
+[**Apollo 1.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_hardware_system_installation_guide.md) 
+
+Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
+
+![image alt text](docs/demo_guide/images/Apollo_1_5.png)	
+
+**For Setup:**
+
+* All the requirements mentioned in version 1.0
+
+* **Hardware**:
+
+    * Light Detection and Ranging System (LiDAR)
+
+    * ASUS GTX1080 GPU-A8G- Gaming GPU Card
+
+* **Software**:
+
+    * Nvidia GPU Driver
+
+[**Apollo 2.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
+
+Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
+
+![image alt text](docs/demo_guide/images/Apollo_2.png)
+
+**For Setup:**
+
+* All the requirements mentioned in versions 1.5 and 1.0
+
+* **Hardware**:
+
+    * Traffic Light Detection using Camera
+
+    * Ranging System (LiDAR)
+
+    * Radar
+
+* **Software**:
+
+    * Same as 1.5
+
+[**Apollo 2.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
+
+Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+
+```
+Please note, if you need to test Apollo 2.5; for safety purposes, please seek the help of the
+Apollo Engineering team. Your safety is our #1 priority,
+and we want to ensure Apollo 2.5 was integrated correctly with your vehicle before you hit the road. 
+```
+
+![image alt text](docs/demo_guide/images/Apollo_2_5.png)
+
+**For Setup:**
+
+* All the requirements mentioned in 2.0
+
+* Hardware:
+
+    * Additional Camera
+
+* Software: 
+
+    * Same as 2.0
+
+[**Apollo 3.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md)
+
+Apollo 3.0's main focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+
+![image alt text](docs/demo_guide/images/Apollo_3.0_diagram.png)
+
+**For Setup:**
+
+* Hardware:
+
+    * Ultrasonic sensors
+    * Apollo Sensor Unit
+    * Apollo Hardware Development Platform with additional sensor support and flexibility
+
+* Software: 
+
+    * Guardian
+    * Monitor
+    * Additional drivers to support Hardware
+
+## Architecture
+
+* **Hardware/ Vehicle Overview**
+
+![image alt text](docs/demo_guide/images/Hardware_overview.png)
+
+* **Hardware Connection Overview**
+
+![image alt text](docs/demo_guide/images/Hardware_connection.png)
+
+* **Software Overview - Navigation Mode**
+
+![image alt text](docs/specs/images/Apollo_3.0_SW.png)
+
+## Installation
+
+* [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo) 
+
+* [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
+
+* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+
+If at this point, you do not have a Hardware setup, please go to [Without Hardware](#without-hardware). 
+
+### With Hardware:
+
+* [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
+
+* [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
+
+* [Apollo 2.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_quick_start.md)
+
+* [Apollo 2.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_quick_start.md)
+
+* [Apollo 3.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md)
+
+### Without Hardware:
+
+* [How to Build Apollo ](https://github.com/ApolloAuto/apollo/tree/master/docs/demo_guide)
+
+## Documents
+
+* [Technical Tutorial](https://github.com/ApolloAuto/apollo/tree/master/docs/technical_tutorial): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
+
+* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
+
+* [Specs](https://github.com/ApolloAuto/apollo/tree/master/docs/specs): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
+
+* [FAQs](https://github.com/ApolloAuto/apollo/tree/master/docs/FAQs) 
+
+## Questions
+
+You are welcome to submit questions and bug reports as [GitHub Issues](https://github.com/ApolloAuto/apollo/issues).
+
+## Copyright and License
+
+Apollo is provided under the [Apache-2.0 license](https://github.com/natashadsouza/apollo/blob/master/LICENSE).
+
+## Disclaimer
+
+Please refer the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
+
+## Connect with us 
+* [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
+* [Twitter](https://twitter.com/apolloplatform)
+* [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
+* [Blog](https://www.medium.com/apollo-auto)
+* [Newsletter](http://eepurl.com/c-mLSz)
+* Interested in our turnKey solutions or partnering with us Mail us at: apollopartner@baidu.com
+
+
