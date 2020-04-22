@@ -1,14 +1,10 @@
 # Bazel
-bazel-apollo
-bazel-apollo_dev
-bazel-bin
-bazel-genfiles
-bazel-out
-bazel-testlogs
+bazel-*
 /Debug/
 *.pyc
 *genrule.log
 WORKSPACE
+
 # temporary files
 *.swp
 *.swo
@@ -16,6 +12,8 @@ WORKSPACE
 generated_data_warehouse.conf
 modules/common/data/ssl_keys
 modules/perception/cuda_util/cmake_build
+.DS_Store
+*~
 
 # Eclipse IDE files
 .project
@@ -38,6 +36,7 @@ modules/perception/cuda_util/cmake_build
 nohup.out
 *.bak
 *.csv.result
+*.bk
 
 # Editor configs
 .ycm_extra_conf.py
@@ -51,6 +50,7 @@ third_party/ros
 third_party/ros_aarch64/
 third_party/ros_x86_64/
 modules/ros/third_party/fast-rtps
+modules/dreamview/fronted/node_modules
 
 # Data
 data/prediction
@@ -70,8 +70,8 @@ modules/tools/ota/vehicle_info.pb.txt
 docs/doxygen
 
 # Esd can lib
-third_party/can_card_library/esd_can/include
-third_party/can_card_library/esd_can/lib
+#third_party/can_card_library/esd_can/include
+#third_party/can_card_library/esd_can/lib
 
 # Map data files
 modules/map/data
