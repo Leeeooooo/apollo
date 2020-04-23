@@ -95,12 +95,12 @@ fi
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 check_agreement
 
-VOLUME_VERSION="latest"
-DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-)
-MAP_VOLUME_CONF=""
+#VOLUME_VERSION="latest"
+#DEFAULT_MAPS=(
+#  sunnyvale_big_loop
+#  sunnyvale_loop
+#)
+#MAP_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
@@ -200,16 +200,16 @@ function local_volumes() {
 
 function main(){
 
-    if [ "$LOCAL_IMAGE" = "yes" ];then
+    #if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $IMG"
-    else
-        info "Start pulling docker image $IMG ..."
+    #else
+        #info "Start pulling docker image $IMG ..."
         #docker pull $IMG
-        if [ $? -ne 0 ];then
-            error "Failed to pull docker image."
-            exit 1
-        fi
-    fi
+        #if [ $? -ne 0 ];then
+        #    error "Failed to pull docker image."
+        #    exit 1
+        #fi
+    #fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
@@ -218,9 +218,9 @@ function main(){
     fi
 
     # Included default maps.
-    for map_name in ${DEFAULT_MAPS[@]}; do
-      source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
-    done
+#    for map_name in ${DEFAULT_MAPS[@]}; do
+#      source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+#    done
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -243,28 +243,25 @@ function main(){
         mkdir "$HOME/.cache"
     fi
 
-    LOCALIZATION_VOLUME=apollo_localization_volume
-    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
+#    LOCALIZATION_VOLUME=apollo_localization_volume
+#    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
+#
+#    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
+#    #docker pull ${LOCALIZATION_VOLUME_IMAGE}
+#    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+#
+#    YOLO3D_VOLUME=apollo_yolo3d_volume
+#    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+#
+#    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
+#    #docker pull ${YOLO3D_VOLUME_IMAGE}
+#    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
-    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-    #docker pull ${LOCALIZATION_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
-
-    YOLO3D_VOLUME=apollo_yolo3d_volume
-    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
-
-    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
-    #docker pull ${YOLO3D_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
-
-    info "Starting docker container \"apollo_dev\" ..."
+    info "Starting docker container \"apollo_dev\" without yolo_model and sunxx_map..."
     docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
-        ${MAP_VOLUME_CONF} \
-        --volumes-from ${LOCALIZATION_VOLUME} \
-        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
