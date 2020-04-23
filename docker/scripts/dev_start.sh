@@ -184,7 +184,7 @@ function local_volumes() {
         Linux)
             volumes="${volumes} -v /dev:/dev \
                                 -v /media:/media \
-				-v /home/tmp/ros:/home/tmp/ros \
+				-v /home/tmp:/home/tmp \
                                 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                                 -v /etc/localtime:/etc/localtime:ro \
                                 -v /usr/src:/usr/src \
@@ -243,19 +243,19 @@ function main(){
         mkdir "$HOME/.cache"
     fi
 
-#    LOCALIZATION_VOLUME=apollo_localization_volume
-#    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
-#
-#    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-#    #docker pull ${LOCALIZATION_VOLUME_IMAGE}
-#    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
-#
-#    YOLO3D_VOLUME=apollo_yolo3d_volume
-#    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
-#
-#    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
-#    #docker pull ${YOLO3D_VOLUME_IMAGE}
-#    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
+    LOCALIZATION_VOLUME=apollo_localization_volume
+    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
+
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
+    #docker pull ${LOCALIZATION_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+
+    YOLO3D_VOLUME=apollo_yolo3d_volume
+    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
+    #docker pull ${YOLO3D_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
     info "Starting docker container \"apollo_dev\" without yolo_model and sunxx_map..."
     docker run -it \

@@ -41,11 +41,11 @@ new_http_archive(
 )
 
 # cpplint from google style guide
-new_git_repository(
+new_http_archive(
     name = "google_styleguide",
     build_file = "third_party/google_styleguide.BUILD",
-    commit = "159b4c81bbca97a9ca00f1195a37174388398a67",
-    remote = "https://github.com/google/styleguide.git",
+    strip_prefix = "styleguide-159b4c81bbca97a9ca00f1195a37174388398a67",
+    url = "file:///home/tmp/styleguide.zip",
 )
 
 # eigen
