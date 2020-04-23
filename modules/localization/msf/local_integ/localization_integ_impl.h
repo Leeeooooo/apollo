@@ -83,12 +83,16 @@ class LocalizationIntegImpl {
 
   void GetLastestGnssLocalization(LocalizationMeasureState *state,
                                   LocalizationEstimate *gnss_localization);
+  void GetLastestHeadingLocalization(LocalizationMeasureState *state,
+                                  LocalizationEstimate *heading_localization);                                 
 
   void GetLidarLocalizationList(std::list<LocalizationResult> *results);
 
   void GetIntegLocalizationList(std::list<LocalizationResult> *results);
 
   void GetGnssLocalizationList(std::list<LocalizationResult> *results);
+  void GetHeadingLocalizationList(std::list<LocalizationResult> *results);
+
 
  protected:
   void StartThreadLoop();
@@ -113,6 +117,8 @@ class LocalizationIntegImpl {
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate *localization);
+  void TransferHeadingMeasureToLocalization(const MeasureData& measure,
+                                         LocalizationEstimate *localization);                                      
 
  private:
   MeasureRepublishProcess* republish_process_;
@@ -135,6 +141,11 @@ class LocalizationIntegImpl {
   size_t gnss_localization_list_max_size_;
   std::mutex gnss_localization_mutex_;
   bool is_use_gnss_bestpose_;
+
+  // heading localization result list
+  std::list<LocalizationResult> heading_localization_list_;
+  size_t heading_localization_list_max_size_;
+  std::mutex heading_localization_mutex_;
 
   // lidar process thread
   std::atomic<bool> keep_lidar_running_;
@@ -169,7 +180,7 @@ class LocalizationIntegImpl {
   std::thread gnss_heading_function_thread_;
   std::condition_variable gnss_heading_function_signal_;
   std::queue<std::function<void()>> gnss_heading_function_queue_;
-  int gnss_heading_queue_max_size_;
+  size_t gnss_heading_queue_max_size_;
   std::mutex gnss_heading_function_queue_mutex_;
 
   bool enable_lidar_localization_;

@@ -36,6 +36,7 @@ DECLARE_string(msf_visual_adapter_config_file);
 DECLARE_string(localization_msf_gnss_filename);
 DECLARE_string(localization_msf_lidar_filename);
 DECLARE_string(localization_pose_filename);
+DECLARE_string(localization_heading_filename);
 
 DECLARE_bool(enable_csv_log);
 DECLARE_bool(enable_gps_imu_interprolate);
@@ -85,6 +86,7 @@ DECLARE_bool(enable_ins_aid_rtk);
 DECLARE_string(eph_buffer_path);
 DECLARE_string(ant_imu_leverarm_file);
 DECLARE_bool(gnss_debug_log_flag);
+DECLARE_bool(heading_debug_log_flag);
 DECLARE_bool(if_imuant_from_file);
 DECLARE_double(imu_to_ant_offset_x);
 DECLARE_double(imu_to_ant_offset_y);

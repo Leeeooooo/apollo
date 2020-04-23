@@ -18,6 +18,7 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
@@ -404,6 +405,20 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(const std::string& file_path,
         double qw = config["transform"]["rotation"]["w"].as<double>();
         lidar_extrinsic->linear() =
             Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
+        lidar_imu_quat_.x() = qx;
+        lidar_imu_quat_.y() = qy;
+        lidar_imu_quat_.z() = qz;
+        lidar_imu_quat_.w() = qw;
+        AINFO << "lidar_extrinsic_quat: " << lidar_imu_quat_.x() << " "
+        << lidar_imu_quat_.y() << " " << lidar_imu_quat_.z() << " "
+        << lidar_imu_quat_.w();
+       common::math::EulerAnglesZXYd lidar_imu_euler(lidar_imu_quat_.w(),
+                                      lidar_imu_quat_.x(),
+                                      lidar_imu_quat_.y(),
+                                      lidar_imu_quat_.z());
+        AINFO <<"from lidar_extrinsic,get lidar_imu_enler:"
+              <<lidar_imu_euler.roll()*RAD_TO_DEG << " " <<lidar_imu_euler.pitch()*RAD_TO_DEG << " " <<lidar_imu_euler.yaw()*RAD_TO_DEG <<"\n";
+
         return true;
       }
     }

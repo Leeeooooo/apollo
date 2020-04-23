@@ -80,6 +80,7 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
     AERROR << "Exception: " << ex.what();
     return false;
   }
+  
   Eigen::Affine3d affine_localization_3d;
   tf::transformMsgToEigen(transform_stamped.transform, affine_localization_3d);
   Eigen::Matrix4d novatel2world_trans = affine_localization_3d.matrix();
@@ -88,8 +89,12 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
   } else {
     *trans = novatel2world_trans * lidar2novatel_trans;
   }
-  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-         << FLAGS_localization_tf2_child_frame_id << " trans: " << *trans;
+
+  ADEBUG << "get " <<FLAGS_localization_tf2_frame_id << " to "
+	 <<FLAGS_localization_tf2_child_frame_id << " trans: " << novatel2world_trans;
+
+  ADEBUG << "get " << FLAGS_localization_tf2_frame_id << " to "
+         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
 

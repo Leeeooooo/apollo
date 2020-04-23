@@ -112,6 +112,14 @@ void LocalizationInteg::GetLastestGnssLocalization(
   return;
 }
 
+void LocalizationInteg::GetLastestHeadingLocalization(
+    LocalizationMeasureState *state,
+    LocalizationEstimate *heading_localization) {
+  localization_integ_impl_->GetLastestHeadingLocalization(
+      state, heading_localization);
+  return;
+}
+
 void LocalizationInteg::GetLidarLocalizationList(
     std::list<LocalizationResult> *results) {
   localization_integ_impl_->GetLidarLocalizationList(results);
@@ -127,6 +135,12 @@ void LocalizationInteg::GetIntegLocalizationList(
 void LocalizationInteg::GetGnssLocalizationList(
     std::list<LocalizationResult> *results) {
   localization_integ_impl_->GetGnssLocalizationList(results);
+  return;
+}
+
+void LocalizationInteg::GetHeadingLocalizationList(
+    std::list<LocalizationResult> *results) {
+  localization_integ_impl_->GetHeadingLocalizationList(results);
   return;
 }
 

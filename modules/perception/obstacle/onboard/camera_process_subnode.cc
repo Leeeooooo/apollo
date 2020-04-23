@@ -33,8 +33,8 @@ bool CameraProcessSubnode::InitInternal() {
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
       shared_data_manager_->GetSharedData("CameraObjectData"));
-  cam_shared_data_ = static_cast<CameraSharedData *>(
-      shared_data_manager_->GetSharedData("CameraSharedData"));
+  // cam_shared_data_ = static_cast<CameraSharedData *>(
+  //     shared_data_manager_->GetSharedData("CameraSharedData"));
 
   InitCalibration();
 
@@ -125,11 +125,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   mask = mask*2;
-  if (FLAGS_use_whole_lane_line) {
-    cv::Mat mask1;
-    detector_->Lanetask(img, &mask1);
-    mask += mask1;
-  }
+
+  // if (FLAGS_use_whole_lane_line) {
+  //   cv::Mat mask1;
+  //   detector_->Lanetask(img, &mask1);
+  //   mask += mask1;
+  // }
 
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
 
@@ -157,10 +158,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   VisualObjToSensorObj(objects, &out_objs);
 
   SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
-  camera_item_ptr->image_src_mat = img.clone();
-  mask.copyTo(out_objs->camera_frame_supplement->lane_map);
+  //camera_item_ptr->image_src_mat = img.clone();
+  //mask.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
   PERF_BLOCK_END("CameraProcessSubnode publish in DAG");
+  ADEBUG << "camera process succ, there are " << (out_objs->objects).size()
+         << " objects.";
 
   if (pb_obj_) PublishPerceptionPbObj(out_objs);
   if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask, message);
@@ -273,7 +276,7 @@ void CameraProcessSubnode::PublishDataAndEvent(
     const SharedDataPtr<CameraItem> &camera_item) {
   CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
-  cam_shared_data_->Add(key, camera_item);
+  //cam_shared_data_->Add(key, camera_item);
 
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta &event_meta = pub_meta_events_[idx];

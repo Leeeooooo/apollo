@@ -102,7 +102,7 @@ class CameraProcessSubnode : public Subnode {
 
   // Shared Data
   CameraObjectData* cam_obj_data_;
-  CameraSharedData* cam_shared_data_;
+  //CameraSharedData* cam_shared_data_;
 
   // Calibration
   int32_t image_height_ = 1080;

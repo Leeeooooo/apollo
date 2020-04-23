@@ -19,8 +19,8 @@
 #include <yaml-cpp/yaml.h>
 #include <list>
 #include <fstream>
-
 #include <iomanip>
+
 #include "modules/drivers/gnss/proto/config.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -57,7 +57,8 @@ void WriteHeaders(std::ofstream &file_stream) {
   file_stream << "timestamp_sec,"
               << "x,"
               << "y,"
-              << "z" <<std::endl;
+              << "z,"
+              << "yaw" <<std::endl;
 
 }
 }
@@ -67,18 +68,22 @@ MSFLocalization::MSFLocalization()
       localization_state_(msf::LocalizationMeasureState::OK),
       pcd_msg_index_(-1),
       latest_lidar_localization_status_(MeasureState::NOT_VALID),
-      latest_gnss_localization_status_(MeasureState::NOT_VALID)
+      latest_gnss_localization_status_(MeasureState::NOT_VALID),
+      latest_heading_localization_status_(MeasureState::NOT_VALID)
       {
        if (FLAGS_enable_csv_log) {
        msf_gnss_log_file_.open(GetLogFileName(FLAGS_localization_msf_gnss_filename));
-       msf_gnss_log_file_<<std::setprecision(12);
+       msf_gnss_log_file_ << std::setprecision(12);
        WriteHeaders(msf_gnss_log_file_);
        msf_lidar_log_file_.open(GetLogFileName(FLAGS_localization_msf_lidar_filename));
-       msf_lidar_log_file_<<std::setprecision(12);
+       msf_lidar_log_file_ << std::setprecision(12);
        WriteHeaders(msf_lidar_log_file_);
        pose_log_file_.open(GetLogFileName(FLAGS_localization_pose_filename));
-      pose_log_file_<<std::setprecision(12);
+       pose_log_file_ << std::setprecision(12);
        WriteHeaders(pose_log_file_);
+       heading_log_file_.open(GetLogFileName(FLAGS_localization_heading_filename));
+       heading_log_file_ << std::setprecision(16);
+       WriteHeaders(heading_log_file_);
 
      }
       
@@ -193,6 +198,11 @@ void MSFLocalization::CloseLogFile() {
   if (FLAGS_enable_csv_log && pose_log_file_.is_open()) 
   {
     pose_log_file_.close();
+  }
+
+  if (FLAGS_enable_csv_log && heading_log_file_.is_open()) 
+  {
+    heading_log_file_.close();
   }
 }
 
@@ -342,17 +352,27 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
         // publish lidar message to debug
         AdapterManager::PublishLocalizationMsfLidar(itr->localization());
         LocalizationEstimate local_result = itr->localization();
+        Eigen::Quaterniond MsfLidar_quat(local_result.pose().orientation().qw(),
+                               local_result.pose().orientation().qx(),
+                               local_result.pose().orientation().qy(),
+                               local_result.pose().orientation().qz());
+        
+        common::math::EulerAnglesZXYd lidar_euler(MsfLidar_quat.w(),
+                                      MsfLidar_quat.x(),
+                                      MsfLidar_quat.y(),
+                                      MsfLidar_quat.z());
         // SaveLocalizationFile(FLAGS_localization_msf_lidar_filename, local_result);
         if (FLAGS_enable_csv_log) {
         msf_lidar_log_file_ << local_result.header().timestamp_sec() << "," << local_result.pose().position().x() 
-                            << "," << local_result.pose().position().y() << "," << local_result.pose().position().z() << "\n";
+                            << "," << local_result.pose().position().y() << "," << local_result.pose().position().z() 
+                            << "," <<lidar_euler.yaw()*RAD_TO_DEG << "\n";
             }
         }
-   //   else
-      //{
-     // AERROR <<"latest_lidar_localization_status is NOT_VALID or NOT_STABLE,"
-        //     <<"latest_lidar_localization_status:" <<static_cast<int>(itr->state()); 
-      //}
+      // else
+      // {
+      // AERROR <<"latest_lidar_localization_status is NOT_VALID or NOT_STABLE,"
+      //        <<"latest_lidar_localization_status:" <<static_cast<int>(itr->state()); 
+      // }
     }     
   }
 
@@ -386,6 +406,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
         itr->state() == msf::LocalizationMeasureState::VALID) {
       // caculate orientation_vehicle_world
       LocalizationEstimate local_result = itr->localization();
+      LocalizationEstimate pose_result = itr->localization();
       apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
       const apollo::common::Quaternion &orientation = posepb_loc->orientation();
       const Eigen::Quaternion<double> quaternion(
@@ -411,16 +432,17 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
       PublishPoseBroadcastTF(local_result);
       AdapterManager::PublishLocalization(local_result);
       if (FLAGS_enable_csv_log) {
-        pose_log_file_ << local_result.header().timestamp_sec() << "," << local_result.pose().position().x() 
-                            << "," << local_result.pose().position().y() << "," << local_result.pose().position().z() << "\n";
+        pose_log_file_ << pose_result.header().timestamp_sec() << "," << pose_result.pose().position().x() 
+                            << "," << pose_result.pose().position().y() << "," << pose_result.pose().position().z() 
+                            << "," << pose_result.pose().euler_angles().z() * RAD_TO_DEG  <<"\n";
             }
       //SaveLocalizationFile(FLAGS_localization_pose_filename, local_result);
     }
-   // else
-    //{
-     // AERROR <<"The last msf localization_status is NOT_VALID or NOT_STABLE,"
-      //       <<"The last msf localization_status:" <<static_cast<int>(itr->state());
-    //}
+    // else
+    // {
+    //   AERROR <<"The last msf localization_status is NOT_VALID or NOT_STABLE,"
+    //          <<"The last msf localization_status:" <<static_cast<int>(itr->state());
+    // }
   }
 
   if (!integ_localization_list.empty()) {
@@ -454,15 +476,16 @@ void MSFLocalization::OnGnssBestPose(
         LocalizationEstimate local_result = itr->localization();
         if (FLAGS_enable_csv_log) {
         msf_gnss_log_file_ << local_result.header().timestamp_sec() << "," << local_result.pose().position().x() 
-                            << "," << local_result.pose().position().y() << "," << local_result.pose().position().z() << "\n";
+                            << "," << local_result.pose().position().y() << "," << local_result.pose().position().z()
+                            << "," << "0" << "\n";
             }
         // SaveLocalizationFile(FLAGS_localization_msf_gnss_filename, local_result);
       }
-     // else
-      //{
-       // AERROR <<"The latest msf gnss_status is NOT_VALID or NOT_STABLE,"
-       //      <<"The latest msf gnss_status:" <<static_cast<int>(itr->state());
-     // }
+      // else
+      // {
+      //   AERROR <<"The latest msf gnss_status is NOT_VALID or NOT_STABLE,"
+      //        <<"The latest msf gnss_status:" <<static_cast<int>(itr->state());
+      // }
     }
   }
 
@@ -512,6 +535,26 @@ void MSFLocalization::OnGnssRtkEph(
 void MSFLocalization::OnGnssHeading(
   const drivers::gnss::Heading &gnssheading_msg) {
   localization_integ_.GnssHeadingProcess(gnssheading_msg);
+  if (FLAGS_heading_debug_log_flag) {
+    std::list<msf::LocalizationResult> heading_localization_list;
+    localization_integ_.GetHeadingLocalizationList(&heading_localization_list);
+
+    for (auto itr = heading_localization_list.begin();
+         itr != heading_localization_list.end(); ++itr) {
+      latest_heading_localization_status_ =
+          static_cast<MeasureState>(itr->state());
+      if (itr->state() == msf::LocalizationMeasureState::OK ||
+          itr->state() == msf::LocalizationMeasureState::VALID) {
+        //AdapterManager::PublishLocalizationMsfGnss(itr->localization());
+       LocalizationEstimate local_result = itr->localization();
+      if (FLAGS_enable_csv_log) {
+        heading_log_file_ << local_result.header().timestamp_sec() << "," << "0" 
+                            << "," << "0" << "," << "0"
+                            << "," << local_result.pose().euler_angles().z() * RAD_TO_DEG<< "\n"; 
+      }
+    }
+  }
+}
 }
 
 bool MSFLocalization::LoadGnssAntennaExtrinsic(

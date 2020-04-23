@@ -39,14 +39,18 @@ DEFINE_string(msf_visual_adapter_config_file,
               "msf visualization adapter configuration");
 
 DEFINE_string(localization_msf_gnss_filename,
-              "modules/localization/data/msf_gnss/",
+              "data/msf_gnss/",
                "save localizaton msf gnss data");
 DEFINE_string(localization_msf_lidar_filename,
-              "modules/localization/data/msf_lidar/",
+              "data/msf_lidar/",
               "save localizaton msf lidar data");
 DEFINE_string(localization_pose_filename,
-              "modules/localization/data/pose/",
+              "data/pose/",
               "save localizaton pose data");
+
+DEFINE_string(localization_heading_filename,
+              "data/heading/",
+              "save localizaton heading data");           
 
 // features
 DEFINE_bool(enable_csv_log, true, "True to write out csv debug file.");
@@ -121,6 +125,7 @@ DEFINE_string(
     "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml",
     "Ant to imu leferarm.");
 DEFINE_bool(gnss_debug_log_flag, false, "Gnss Debug switch.");
+DEFINE_bool(heading_debug_log_flag, false, "heading Debug switch.");
 DEFINE_bool(if_imuant_from_file, true, "Use imu ant from gnss configure file.");
 DEFINE_double(imu_to_ant_offset_x, 0.0, "Imu ant offset x");
 DEFINE_double(imu_to_ant_offset_y, 0.0, "Imu ant offset y");

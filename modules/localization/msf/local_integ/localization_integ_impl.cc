@@ -20,6 +20,7 @@
 #include <queue>
 
 #include "modules/common/time/timer.h"
+#include "modules/common/time/time.h"
 #include "modules/common/log.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
@@ -28,7 +29,7 @@ namespace localization {
 namespace msf {
 
 using common::Status;
-
+using apollo::common::time::Clock;
 LocalizationIntegImpl::LocalizationIntegImpl()
     : republish_process_(new MeasureRepublishProcess()),
       integ_process_(new LocalizationIntegProcess()),
@@ -37,11 +38,13 @@ LocalizationIntegImpl::LocalizationIntegImpl()
       lidar_localization_list_max_size_(10),
       integ_localization_list_max_size_(50),
       gnss_localization_list_max_size_(10),
+      heading_localization_list_max_size_(10),
       is_use_gnss_bestpose_(true), keep_lidar_running_(false),
       lidar_queue_max_size_(5), imu_altitude_from_lidar_localization_(0.0),
       imu_altitude_from_lidar_localization_available_(false),
       keep_imu_running_(false), imu_queue_max_size_(200),
       keep_gnss_running_(false), gnss_queue_max_size_(100),
+      keep_gnss_heading_running_(false),gnss_heading_queue_max_size_(100),
       debug_log_flag_(true), enable_lidar_localization_(true),
       gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
 
@@ -446,7 +449,7 @@ void LocalizationIntegImpl::GnssHeadingThreadLoop() {
   while (keep_gnss_heading_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
-      int size = gnss_heading_function_queue_.size();
+      size_t size = gnss_heading_function_queue_.size();
       while (size > gnss_heading_queue_max_size_) {
         gnss_heading_function_queue_.pop();
         --size;
@@ -482,8 +485,31 @@ void LocalizationIntegImpl::GnssHeadingProcessImpl(
   if (republish_process_->GnssHeadingProcess(gnssheading_msg, &measure,
                                              &heading_status)) {
     integ_process_->MeasureDataProcess(measure);
+    LocalizationEstimate heading_localization;
+    TransferHeadingMeasureToLocalization(measure, &heading_localization);
+    heading_localization_mutex_.lock();
+    heading_localization_list_.push_back(
+        LocalizationResult(LocalizationMeasureState::OK, heading_localization));
+    if (heading_localization_list_.size() > heading_localization_list_max_size_) {
+      heading_localization_list_.pop_front();
+    }
+    heading_localization_mutex_.unlock();
   }
+  return;
 }
+
+void LocalizationIntegImpl::TransferHeadingMeasureToLocalization(
+    const MeasureData& measure, LocalizationEstimate *localization){
+    CHECK_NOTNULL(localization);
+    apollo::common::Header* headerpb = localization->mutable_header();
+    apollo::localization::Pose* posepb = localization->mutable_pose();
+    double timestamp = measure.time;
+    localization->set_measurement_time(timestamp);
+    headerpb->set_timestamp_sec(Clock::NowInSeconds());
+    apollo::common::Point3D *eulerangles = posepb->mutable_euler_angles();
+    eulerangles->set_z(measure.gnss_att.yaw);
+    return;
+    }
 
 void LocalizationIntegImpl::GnssThreadLoop() {
   AINFO << "Started gnss process thread";
@@ -690,6 +716,24 @@ void LocalizationIntegImpl::GetLastestGnssLocalization(
   return;
 }
 
+void LocalizationIntegImpl::GetLastestHeadingLocalization(
+    LocalizationMeasureState *state,
+    LocalizationEstimate *heading_localization) {
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(heading_localization);
+
+  heading_localization_mutex_.lock();
+  if (heading_localization_list_.size()) {
+    *state = heading_localization_list_.front().state();
+    *heading_localization = heading_localization_list_.front().localization();
+    heading_localization_list_.clear();
+  } else {
+    *state = LocalizationMeasureState::NOT_VALID;
+  }
+  heading_localization_mutex_.unlock();
+  return;
+}
+
 void LocalizationIntegImpl::GetLidarLocalizationList(
     std::list<LocalizationResult> *results) {
   CHECK_NOTNULL(results);
@@ -718,6 +762,17 @@ void LocalizationIntegImpl::GetGnssLocalizationList(
   *results = gnss_localization_list_;
   gnss_localization_list_.clear();
   gnss_localization_mutex_.unlock();
+  return;
+}
+
+void LocalizationIntegImpl::GetHeadingLocalizationList(
+    std::list<LocalizationResult> *results) {
+  CHECK_NOTNULL(results);
+
+  heading_localization_mutex_.lock();
+  *results = heading_localization_list_;
+  heading_localization_list_.clear();
+  heading_localization_mutex_.unlock();
   return;
 }
 

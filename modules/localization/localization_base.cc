@@ -44,7 +44,16 @@ void LocalizationBase::PublishPoseBroadcastTF(
   tf2_msg.transform.rotation.y = localization.pose().orientation().qy();
   tf2_msg.transform.rotation.z = localization.pose().orientation().qz();
   tf2_msg.transform.rotation.w = localization.pose().orientation().qw();
-
+  AINFO << "localization tf2_msg transXYZ:" <<tf2_msg.transform.translation.x << " " <<tf2_msg.transform.translation.y
+                                             << " " <<tf2_msg.transform.translation.z <<"\n";
+  AINFO << "localization tf2_msg rotationXYZW:" << tf2_msg.transform.rotation.x << " " << tf2_msg.transform.rotation.y
+                                              << " " << tf2_msg.transform.rotation.z <<" "<< tf2_msg.transform.rotation.w <<"\n";
+  common::math::EulerAnglesZXYd world_localization_euler(tf2_msg.transform.rotation.w,
+                                      tf2_msg.transform.rotation.x,
+                                      tf2_msg.transform.rotation.y,
+                                      tf2_msg.transform.rotation.z);
+        AINFO <<"from world to localization,get world_localization_eulerRPY:"
+              <<world_localization_euler.roll()*RAD_TO_DEG << " " <<world_localization_euler.pitch()*RAD_TO_DEG << " " <<world_localization_euler.yaw()*RAD_TO_DEG <<"\n";                                            
   tf2_broadcaster_->sendTransform(tf2_msg);
 }
 

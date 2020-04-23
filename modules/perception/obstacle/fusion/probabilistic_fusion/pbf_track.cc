@@ -391,11 +391,12 @@ bool PbfTrack::AbleToPublish() {
     return true;
   }
 
-  ADEBUG << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
-         << lidar_objects_.size() << " " << s_publish_if_has_radar_ <<" " << invisible_in_radar_ << " " << radar_objects_.size();
+  ADEBUG << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " " << lidar_objects_.size() << " "
+         << s_publish_if_has_radar_ << " " << invisible_in_radar_ << " " << radar_objects_.size() << " "
+         << invisible_in_camera_ << " " << camera_objects_.size();
   double invisible_period_threshold = 0.001;
   if (invisible_period_ > invisible_period_threshold && invisible_in_lidar_ &&
-      invisible_in_radar_) {
+      invisible_in_radar_ && invisible_in_camera_) {
     ADEBUG << "unable_to_publish: invisible " << invisible_period_;
     return false;
   }
@@ -405,21 +406,25 @@ bool PbfTrack::AbleToPublish() {
     return true;
   }
 
-  //std::shared_ptr<PbfSensorObject> radar_object = GetLatestRadarObject();
-  //if (s_publish_if_has_radar_ && !invisible_in_radar_ &&
-    //  radar_object != nullptr) {
-    //if (radar_object->sensor_type == SensorType::RADAR) {
-      //if (radar_object->object->radar_supplement->range >
-        //      s_min_radar_confident_distance_ &&
-          //radar_object->object->radar_supplement->angle <
-            //  s_max_radar_confident_angle_) {
-       // if (fused_object_->object->velocity.dot(
-         //       fused_object_->object->direction) < 0.3) {
-         // fused_object_->object->velocity.setZero();
-         // return false;
-        //}
+  if (!invisible_in_camera_ && !camera_objects_.empty()){
+    return true;
+  }
+
+  // std::shared_ptr<PbfSensorObject> radar_object = GetLatestRadarObject();
+  // if (s_publish_if_has_radar_ && !invisible_in_radar_ &&
+  //     radar_object != nullptr) {
+  //   if (radar_object->sensor_type == SensorType::RADAR) {
+  //     if (radar_object->object->radar_supplement->range >
+  //             s_min_radar_confident_distance_ &&
+  //         radar_object->object->radar_supplement->angle <
+  //             s_max_radar_confident_angle_) {
+  //       if (fused_object_->object->velocity.dot(
+  //               fused_object_->object->direction) < 0.3) {
+  //         fused_object_->object->velocity.setZero();
+  //         return false;
+  //       }
         return true;
-     // }
+      //}
     //}
   //}
   //return false;

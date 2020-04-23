@@ -105,7 +105,8 @@ class MSFLocalization : public LocalizationBase {
 
   MeasureState latest_lidar_localization_status_;
   MeasureState latest_gnss_localization_status_;
-
+  MeasureState latest_heading_localization_status_;
+  static constexpr double RAD_TO_DEG = 57.295779513082323;
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
 
   // rotation from the vehicle coord to imu coord
@@ -113,6 +114,7 @@ class MSFLocalization : public LocalizationBase {
   std::ofstream msf_gnss_log_file_;
   std::ofstream msf_lidar_log_file_;
   std::ofstream pose_log_file_;
+  std::ofstream heading_log_file_;
 };
 
 }  // namespace localization

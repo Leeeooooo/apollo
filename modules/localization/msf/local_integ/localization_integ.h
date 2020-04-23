@@ -86,12 +86,15 @@ class LocalizationInteg {
 
   void GetLastestGnssLocalization(LocalizationMeasureState *state,
                                   LocalizationEstimate *gnss_localization);
-
+  
+  void GetLastestHeadingLocalization(LocalizationMeasureState *state,
+                                  LocalizationEstimate *Heading_localization);
   void GetLidarLocalizationList(std::list<LocalizationResult> *results);
 
   void GetIntegLocalizationList(std::list<LocalizationResult> *results);
 
   void GetGnssLocalizationList(std::list<LocalizationResult> *results);
+  void GetHeadingLocalizationList(std::list<LocalizationResult> *results);
 
  protected:
   void TransferImuFlu(const drivers::gnss::Imu &imu_msg,
