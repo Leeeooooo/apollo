@@ -257,11 +257,13 @@ function main(){
     #docker pull ${YOLO3D_VOLUME_IMAGE}
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
-    info "Starting docker container \"apollo_dev\" without yolo_model and sunxx_map..."
+    info "Starting docker container \"apollo_dev\" without sunxx_map..."
     docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
+        --volumes-from ${LOCALIZATION_VOLUME} \
+        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
