@@ -19,6 +19,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/common/math/euler_angles_zxy.h"
 
 namespace apollo {
 namespace localization {
@@ -53,7 +54,8 @@ void LocalizationBase::PublishPoseBroadcastTF(
                                       tf2_msg.transform.rotation.y,
                                       tf2_msg.transform.rotation.z);
         AINFO <<"from world to localization,get world_localization_eulerRPY:"
-              <<world_localization_euler.roll()*RAD_TO_DEG << " " <<world_localization_euler.pitch()*RAD_TO_DEG << " " <<world_localization_euler.yaw()*RAD_TO_DEG <<"\n";                                            
+              <<world_localization_euler.roll()*RAD_TO_DEG << " " <<world_localization_euler.pitch()*RAD_TO_DEG << " " <<world_localization_euler.yaw()*RAD_TO_DEG <<"\n";
+
   tf2_broadcaster_->sendTransform(tf2_msg);
 }
 
