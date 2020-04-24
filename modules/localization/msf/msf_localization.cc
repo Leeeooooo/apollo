@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/msf_localization.h"
-//#include <string>
 #include <yaml-cpp/yaml.h>
 #include <list>
 #include <fstream>
@@ -47,10 +46,13 @@ namespace {
   std::string GetLogFileName(const std::string& filename) {
   time_t raw_time;
   char name_buffer[80];
-  //std::string catalog="data/localization/";
-  //std::string Refilename=catalog+filename.substr(19);
+  std::string catalog="data/localization/";
+   //std::string Refilename=catalog+filename.substr(19);
+   std::string Refilename=catalog;
+   Refilename+=filename.substr(18);
+ // Refilename.append(filename.substr(19));
   std::time(&raw_time);
-  strftime(name_buffer, 80, std::strcat((char*)filename.c_str(),"%F_%H%M%S.csv"),
+  strftime(name_buffer, 80, std::strcat((char*)Refilename.c_str(),"%F_%H%M%S.csv"),
            localtime(&raw_time));
   return std::string(name_buffer);
 }

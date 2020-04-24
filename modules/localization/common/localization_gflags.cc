@@ -39,17 +39,17 @@ DEFINE_string(msf_visual_adapter_config_file,
               "msf visualization adapter configuration");
 
 DEFINE_string(localization_msf_gnss_filename,
-              "data/msf_gnss/",
+              "data/localization/msf_gnss",
                "save localizaton msf gnss data");
 DEFINE_string(localization_msf_lidar_filename,
-              "data/msf_lidar/",
+              "data/localization/msf_lidar",
               "save localizaton msf lidar data");
 DEFINE_string(localization_pose_filename,
-              "data/pose/",
+              "data/localization/pose",
               "save localizaton pose data");
 
 DEFINE_string(localization_heading_filename,
-              "data/heading/",
+              "data/localization/heading",
               "save localizaton heading data");           
 
 // features
