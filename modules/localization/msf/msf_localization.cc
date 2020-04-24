@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/msf_localization.h"
-
+//#include <string>
 #include <yaml-cpp/yaml.h>
 #include <list>
 #include <fstream>
@@ -47,6 +47,8 @@ namespace {
   std::string GetLogFileName(const std::string& filename) {
   time_t raw_time;
   char name_buffer[80];
+  //std::string catalog="data/localization/";
+  //std::string Refilename=catalog+filename.substr(19);
   std::time(&raw_time);
   strftime(name_buffer, 80, std::strcat((char*)filename.c_str(),"%F_%H%M%S.csv"),
            localtime(&raw_time));
@@ -534,6 +536,12 @@ void MSFLocalization::OnGnssRtkEph(
 
 void MSFLocalization::OnGnssHeading(
   const drivers::gnss::Heading &gnssheading_msg) {
+  if ((localization_state_ == msf::LocalizationMeasureState::OK ||
+       localization_state_ == msf::LocalizationMeasureState::VALID) &&
+      FLAGS_gnss_only_init) {
+    return;
+  }
+
   localization_integ_.GnssHeadingProcess(gnssheading_msg);
   if (FLAGS_heading_debug_log_flag) {
     std::list<msf::LocalizationResult> heading_localization_list;
