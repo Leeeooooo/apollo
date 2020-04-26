@@ -185,6 +185,7 @@ function local_volumes() {
             volumes="${volumes} -v /dev:/dev \
                                 -v /media:/media \
 				-v /home/tmp:/home/tmp \
+                                -v $HOME/disk_sda1:${DOCKER_HOME}/disk_sda1
                                 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                                 -v /etc/localtime:/etc/localtime:ro \
                                 -v /usr/src:/usr/src \
