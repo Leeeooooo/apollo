@@ -81,11 +81,16 @@ modules/map/data
 py_proto
 
 # gnss conf files
-modules/drivers/gnss/conf/conf_beijing
-modules/drivers/gnss/conf/conf_us
+#modules/drivers/gnss/conf/conf_beijing
+#modules/drivers/gnss/conf/conf_us
 
 # calibration files
-modules/calibration/data/mkz056
+#modules/calibration/data/mkz056
 
 # Data bag
 docs/demo_guide/*.bag
+
+# Docker volumes
+modules/perception/model/yolo_camera_detector/lane13d_0716
+modules/perception/model/yolo_camera_detector/lane2d_0627
+modules/perception/model/yolo_camera_detector/yolo3d_1128
