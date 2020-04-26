@@ -26,3 +26,5 @@
 --lidar_height_file=modules/localization/msf/params/velodyne_params/velodyne16_height.yaml
 
 --half_vehicle_width=0.43
+
+--map_dir=/apollo/modules/map/data/parking1change
