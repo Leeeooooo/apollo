@@ -181,12 +181,19 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Routing is not ready.";
       continue;
     }
-    std::list<ReferenceLine> reference_lines;
+/*AERROR << "print routingsegments begin :"<<route_segments_.begin()<<
+"route_segments_.end() is:"<< route_segments_.end();*/
+
+ 
+    std::list<ReferenceLine> reference_lines; 
     std::list<hdmap::RouteSegments> segments;
     if (!CreateReferenceLine(&reference_lines, &segments)) {
       AERROR << "Fail to get reference line";
       continue;
     }
+//AERROR << "segments is:" << segments << " ";
+
+    
     UpdateReferenceLine(reference_lines, segments);
     double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
