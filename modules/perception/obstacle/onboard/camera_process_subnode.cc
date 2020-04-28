@@ -40,7 +40,7 @@ bool CameraProcessSubnode::InitInternal() {
 
   InitModules();
 
-  AdapterManager::AddImageFrontCallback(&CameraProcessSubnode::ImgCallback,
+  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
   if (pb_obj_) {
     AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,

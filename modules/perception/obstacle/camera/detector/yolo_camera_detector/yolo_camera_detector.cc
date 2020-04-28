@@ -48,7 +48,6 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
       yolo_root, "lane.pt");
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
   CHECK(apollo::common::util::GetProtoFromASCIIFile(lane_config, &lane_param_));
-  AERROR << lane_param_.model_param().model_name();
   load_intrinsic(options);
   if (!init_cnn(yolo_root) || !init_cnn_lane(yolo_root)) {
     return false;
