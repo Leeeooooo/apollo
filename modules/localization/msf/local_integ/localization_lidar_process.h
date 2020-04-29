@@ -168,7 +168,7 @@ class LocalizationLidarProcess {
   static constexpr double DEG_TO_RAD = 0.017453292519943;
   static constexpr double DEG_TO_RAD2 = DEG_TO_RAD * DEG_TO_RAD;
   static constexpr double RAD_TO_DEG = 57.295779513082323;
-  Eigen::Quaternion<double> lidar_imu_quat_;
+ // Eigen::Quaternion<double> lidar_imu_quat_;
 };
 
 }  // namespace msf

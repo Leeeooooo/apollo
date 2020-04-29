@@ -405,7 +405,7 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(const std::string& file_path,
         double qw = config["transform"]["rotation"]["w"].as<double>();
         lidar_extrinsic->linear() =
             Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
-        lidar_imu_quat_.x() = qx;
+        /*lidar_imu_quat_.x() = qx;
         lidar_imu_quat_.y() = qy;
         lidar_imu_quat_.z() = qz;
         lidar_imu_quat_.w() = qw;
@@ -417,7 +417,7 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(const std::string& file_path,
                                       lidar_imu_quat_.y(),
                                       lidar_imu_quat_.z());
         AINFO <<"from lidar_extrinsic,get lidar_imu_enler:"
-              <<lidar_imu_euler.roll()*RAD_TO_DEG << " " <<lidar_imu_euler.pitch()*RAD_TO_DEG << " " <<lidar_imu_euler.yaw()*RAD_TO_DEG <<"\n";
+              <<lidar_imu_euler.roll()*RAD_TO_DEG << " " <<lidar_imu_euler.pitch()*RAD_TO_DEG << " " <<lidar_imu_euler.yaw()*RAD_TO_DEG <<"\n";*/
 
         return true;
       }
