@@ -23,7 +23,7 @@ lat_controller_conf {
   mass_rl: 65
   mass_rr: 65
   eps: 0.01
-  matrix_q: 1.0
+  matrix_q: 0.5
   matrix_q: 0.0
   matrix_q: 1.0
   matrix_q: 0.0
@@ -112,28 +112,28 @@ lon_controller_conf {
   calibration_table {
     calibration {
       speed: 0.0
-      acceleration: 0.05
-      command: 33.0
+      acceleration: -0.5
+      command: -20.0
     }
     calibration {
       speed: 0.0
-      acceleration: 0.06
-      command: 10.0
+      acceleration: -0.2
+      command: -10
     }
     calibration {
       speed: 0.0
-      acceleration: 0.1
-      command: -9.0
+      acceleration: -0.1
+      command: -5.0
     }
     calibration {
       speed: 0.0
       acceleration: 0.11
-      command: -11.0
+      command: 11.0
     }
     calibration {
       speed: 0.0
       acceleration: 0.16
-      command: -12.0
+      command: 12.0
     }
     calibration {
       speed: 0.0
