@@ -216,7 +216,7 @@ Status LonController::ComputeControlCommand(
     acceleration_cmd_closeloop =
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
   }
-  AINFO << "acceleration_cmd_closeloop: " << acceleration_cmd_closeloop;
+
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
 
@@ -241,7 +241,7 @@ Status LonController::ComputeControlCommand(
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
   }
-  AINFO << "acceleration_cmd: " << acceleration_cmd;
+
   double throttle_deadzone = lon_controller_conf.throttle_deadzone();
   double brake_deadzone = lon_controller_conf.brake_deadzone();
   double calibration_value = 0.0;
@@ -252,7 +252,7 @@ Status LonController::ComputeControlCommand(
     calibration_value = control_interpolation_->Interpolate(
         std::make_pair(chassis_->speed_mps(), acceleration_cmd));
   }
-  AINFO << "calibration_value: " << calibration_value;
+
   if (calibration_value >= 0) {
     throttle_cmd = calibration_value > throttle_deadzone ? calibration_value
                                                          : throttle_deadzone;
