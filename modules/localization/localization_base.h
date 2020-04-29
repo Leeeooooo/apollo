@@ -62,7 +62,7 @@ class LocalizationBase {
 
  protected:
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;
-  static constexpr double RAD_TO_DEG = 57.295779513082323; 
+ // static constexpr double RAD_TO_DEG = 57.295779513082323; 
 };
 
 }  // namespace localization
