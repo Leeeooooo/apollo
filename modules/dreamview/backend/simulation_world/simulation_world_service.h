@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
+#include <fstream>
 #include "gtest/gtest_prod.h"
 
 #include "third_party/json/json.hpp"
@@ -67,6 +67,7 @@ class SimulationWorldService {
    */
   SimulationWorldService(const MapService *map_service,
                          bool routing_from_file = false);
+  ~SimulationWorldService();
 
   /**
    * @brief Get a read-only view of the SimulationWorld.
@@ -216,7 +217,7 @@ class SimulationWorldService {
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
   void UpdateDelays();
-
+  void CloseLogFile();
   template <typename Points>
   void DownsampleSpeedPointsByInterval(const Points &points,
                                        size_t downsampleInterval,
@@ -264,7 +265,7 @@ class SimulationWorldService {
 
   // Whether the sim_world is ready to push to frontend
   std::atomic<bool> ready_to_push_;
-
+  std::ofstream dv_localization_log_file_;
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorTruncate);

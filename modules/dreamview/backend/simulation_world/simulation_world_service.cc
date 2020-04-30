@@ -20,7 +20,7 @@
 #include <chrono>
 #include <unordered_set>
 #include <vector>
-
+#include <fstream>
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -85,6 +85,23 @@ using ::google::protobuf::util::MessageToJsonString;
 static constexpr double kAngleThreshold = 0.1;
 
 namespace {
+
+std::string GetLogFileName() {
+  time_t raw_time;
+  char name_buffer[80];
+  std::time(&raw_time);
+  strftime(name_buffer, 80, "/data/dv_autocar_%F_%H%M%S.csv",
+           localtime(&raw_time));
+  return std::string(name_buffer);
+}
+
+void WriteHeaders(std::ofstream &file_stream) {
+  file_stream << "timestamp_sec,"
+              << "x,"
+              << "y" 
+              <<std::endl;
+
+}
 
 double CalculateAcceleration(const Point3D &acceleration,
                              const Point3D &velocity) {
@@ -239,6 +256,20 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
+  if (FLAGS_enable_csv_dvlog) {
+       dv_localization_log_file_.open(GetLogFileName());
+       dv_localization_log_file_ << std::setprecision(12);
+       WriteHeaders( dv_localization_log_file_);
+  }
+}
+
+SimulationWorldService::~SimulationWorldService() { CloseLogFile(); }
+void SimulationWorldService::CloseLogFile()
+{
+  if (FLAGS_enable_csv_dvlog && dv_localization_log_file_.is_open()) 
+  {
+    dv_localization_log_file_.close();
+  }
 }
 
 void SimulationWorldService::Update() {
@@ -400,7 +431,11 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
-
+  
+  if (FLAGS_enable_csv_dvlog) {
+       dv_localization_log_file_ << localization.header().timestamp_sec() << "," << localization.pose().position().x() 
+                            << "," << localization.pose().position().y() <<"\n";
+            }
   ready_to_push_.store(true);
 }
 

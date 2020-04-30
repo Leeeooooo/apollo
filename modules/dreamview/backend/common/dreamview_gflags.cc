@@ -88,3 +88,5 @@ DEFINE_double(system_status_lifetime_seconds, 30,
               "Lifetime of a valid SystemStatus message. It's more like a "
               "replay message if the timestamp is old, where we should ignore "
               "the status change.");
+
+DEFINE_bool(enable_csv_dvlog, true, "True to write out csv debug file.");
