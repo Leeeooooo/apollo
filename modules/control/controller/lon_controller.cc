@@ -238,6 +238,8 @@ Status LonController::ComputeControlCommand(
            vehicle_param_.max_abs_speed_when_stopped()) ||
       (debug->path_remain() < 0.3)) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
+    AINFO << "vehicle_param_.max_abs_speed_when_stopped: " << vehicle_param_.max_abs_speed_when_stopped();
+    AINFO << "lon_controller_conf.standstill_acceleration: " << lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
   }

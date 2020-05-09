@@ -28,3 +28,19 @@
 --half_vehicle_width=0.43
 
 --map_dir=/apollo/modules/map/data/parking1change
+
+--map_dir=/apollo/modules/map/data/parking1change
+
+--map_dir=/apollo/modules/map/data/xiaolan
+
+--map_dir=/apollo/modules/map/data/parking1
+
+--map_dir=/apollo/modules/map/data/newparking
+
+--map_dir=/apollo/modules/map/data/parking1
+
+--map_dir=/apollo/modules/map/data/parking1change
+
+--map_dir=/apollo/modules/map/data/parking1
+
+--map_dir=/apollo/modules/map/data/xiaolan
