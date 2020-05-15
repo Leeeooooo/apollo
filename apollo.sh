@@ -201,8 +201,10 @@ function build_py_proto() {
 
   if [ -e './bazel-out/host/bin/external/com_github_google_protobuf/protoc' ]; then
     PROTOC='./bazel-out/host/bin/external/com_github_google_protobuf/protoc'
+  elif [ -e './bazel-out/host/bin/external/com_google_protobuf/protoc' ]; then
+    PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   else
-  PROTOC='protoc'
+    PROTOC='protoc'
   fi
 
   if [ "$1" ] ; then
