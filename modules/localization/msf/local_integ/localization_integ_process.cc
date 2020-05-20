@@ -104,6 +104,16 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
 
   // add imu msg and get current predict pose
   sins_->AddImu(imu_msg);
+
+  if (debug_log_flag_) {
+     AINFO << std::setprecision(16)
+           <<"has added the following imu_msg into sins: "<<"\n"
+           <<"linear_acceleration_vrf_x: " <<imu_msg.fb[0] <<"\n"
+           <<"linear_acceleration_vrf_y: " <<imu_msg.fb[1] <<"\n"
+           <<"angular_velocity_vrf_x: " <<imu_msg.wibb[0] <<"\n"
+           <<"angular_velocity_vrf_y: " <<imu_msg.wibb[1] <<"\n";
+  }
+
   sins_->GetPose(&ins_pva_, pva_covariance_);
 
   if (sins_->IsSinsAligned()) {
@@ -168,20 +178,20 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   // // IntegSinsPva
   // *sins_pva = ins_pva_;
 
-  if (debug_log_flag_ && *state != IntegState::NOT_INIT) {
-    AINFO << std::setprecision(16)
-              << "IntegratedLocalization Debug Log: integ_pose msg: "
-              << "[time:" << ins_pva_.time << "]"
-              << "[x:" << ins_pva_.pos.longitude * 57.295779513082323 << "]"
-              << "[y:" << ins_pva_.pos.latitude * 57.295779513082323 << "]"
-              << "[z:" << ins_pva_.pos.height << "]"
-              << "[ve:" << ins_pva_.vel.ve << "]"
-              << "[vn:" << ins_pva_.vel.vn << "]"
-              << "[vu:" << ins_pva_.vel.vu << "]"
-              << "[pitch: " << ins_pva_.att.pitch * 57.295779513082323 << "]"
-              << "[roll:" << ins_pva_.att.roll * 57.295779513082323 << "]"
-              << "[yaw:" << ins_pva_.att.yaw * 57.295779513082323 << "]";
-  }
+  // if (debug_log_flag_ && *state != IntegState::NOT_INIT) {
+  //   AINFO << std::setprecision(16)
+  //             << "IntegratedLocalization Debug Log: integ_pose msg: "
+  //             << "[time:" << ins_pva_.time << "]"
+  //             << "[x:" << ins_pva_.pos.longitude * 57.295779513082323 << "]"
+  //             << "[y:" << ins_pva_.pos.latitude * 57.295779513082323 << "]"
+  //             << "[z:" << ins_pva_.pos.height << "]"
+  //             << "[ve:" << ins_pva_.vel.ve << "]"
+  //             << "[vn:" << ins_pva_.vel.vn << "]"
+  //             << "[vu:" << ins_pva_.vel.vu << "]"
+  //             << "[pitch: " << ins_pva_.att.pitch * 57.295779513082323 << "]"
+  //             << "[roll:" << ins_pva_.att.roll * 57.295779513082323 << "]"
+  //             << "[yaw:" << ins_pva_.att.yaw * 57.295779513082323 << "]";
+  // }
 
   // LocalizationEstimation
   apollo::common::Header *headerpb_loc = localization->mutable_header();
@@ -236,6 +246,17 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   orientation_std_dev->set_x(std::sqrt(pva_covariance_[6][6]));
   orientation_std_dev->set_y(std::sqrt(pva_covariance_[7][7]));
   orientation_std_dev->set_z(std::sqrt(pva_covariance_[8][8]));
+  
+  if (debug_log_flag_ && *state != IntegState::NOT_INIT) {
+    AINFO << std::setprecision(16)
+              << "current InsPva utm msg: " << "\n"
+              << "measure time:" << localization-> measurement_time() <<"\n"
+              << "header time:" <<localization->header().timestamp_sec() <<"\n"
+              << "x:" << localization->pose().position().x()  <<"\n"
+              << "y:" << localization->pose().position().y() <<"\n"
+              << "std_x:" << localization->uncertainty().position_std_dev().x() <<"\n"
+              <<"std_y:" << localization->uncertainty().position_std_dev().y() <<"\n";
+  }
   return;
 }
 
@@ -313,7 +334,7 @@ void LocalizationIntegProcess::MeasureDataProcessImpl(
 
   sins_->AddMeasurement(measure_msg);
   
-  AINFO <<"time of integrated navigation measure update!";
+  AINFO <<"measure msg has add into sins!";
   //timer.End("time of integrated navigation measure update");
   return;
 }
@@ -323,27 +344,40 @@ bool LocalizationIntegProcess::CheckIntegMeasureData(
   if (measure_data.measure_type == MeasureType::ODOMETER_VEL_ONLY) {
     AERROR << "receive a new odometry measurement!!!\n";
   }
-
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-              << "IntegratedLocalization Debug Log: measure data: "
-              << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
-              << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
-              << "]"
-              << "[z:" << measure_data.gnss_pos.height << "]"
-              << "[ve:" << measure_data.gnss_vel.ve << "]"
-              << "[vn:" << measure_data.gnss_vel.vn << "]"
-              << "[vu:" << measure_data.gnss_vel.vu << "]"
-              << "[pitch:" << measure_data.gnss_att.pitch * 57.295779513082323
-              << "]"
-              << "[roll:" << measure_data.gnss_att.roll * 57.295779513082323
-              << "]"
-              << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
-              << "]"
-              << "[measure type:" << int(measure_data.measure_type) << "]";
+  UTMCoor utm_xy;
+  LatlonToUtmXY(measure_data.gnss_pos.longitude, measure_data.gnss_pos.latitude, &utm_xy);
+//   if (debug_log_flag_) {
+//     AINFO << std::setprecision(16)
+//              << "IntegratedLocalization Debug Log: measure data: "
+//              << "[time:" << measure_data.time << "]"
+//              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
+//              << "]"
+//               << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
+//              << "]"
+//              << "[z:" << measure_data.gnss_pos.height << "]"
+//              << "[ve:" << measure_data.gnss_vel.ve << "]"
+//              << "[vn:" << measure_data.gnss_vel.vn << "]"
+//              << "[vu:" << measure_data.gnss_vel.vu << "]"
+//              << "[pitch:" << measure_data.gnss_att.pitch * 57.295779513082323
+//              << "]"
+//              << "[roll:" << measure_data.gnss_att.roll * 57.295779513082323
+//              << "]"
+//              << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
+//              << "]"
+//              << "[measure type:" << int(measure_data.measure_type) << "]";
+//  }
+if (debug_log_flag_) {
+     AINFO << std::setprecision(16)
+           << "has received a measure data: "
+             << "measure time:" << measure_data.time << "\n"
+             << "x:" << utm_xy.x <<"\n"
+             << "y:" << utm_xy.y <<"\n"
+             << "std_x" << measure_data.variance[0][0] <<"\n"
+             << "std_y" << measure_data.variance[1][1] <<"\n"
+             << "measure type:" << int(measure_data.measure_type) <<"\n";
+              
   }
+
   AINFO << "Receive a new MeasureData, and IntegMeasureData is checked no problem! ";
   return true;
 }

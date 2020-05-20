@@ -188,18 +188,18 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
     }
   }
 
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-          << "MeasureDataRepublish Debug Log: bestgnsspos msg: "
-          << "[time:" << measure->time << "]"
-          << "[x:" << measure->gnss_pos.longitude * RAD_TO_DEG << "]"
-          << "[y:" << measure->gnss_pos.latitude * RAD_TO_DEG << "]"
-          << "[z:" << measure->gnss_pos.height << "]"
-          << "[std_x:" << bestgnsspos_msg.longitude_std_dev() << "]"
-          << "[std_y:" << bestgnsspos_msg.latitude_std_dev() << "]"
-          << "[std_z:" << bestgnsspos_msg.height_std_dev() << "]"
-          << "[position_type:" << bestgnsspos_msg.sol_type() << "]";
-  }
+  // if (debug_log_flag_) {
+  //   AINFO << std::setprecision(16)
+  //         << "MeasureDataRepublish Debug Log: bestgnsspos msg: "
+  //         << "[time:" << measure->time << "]"
+  //         << "[x:" << measure->gnss_pos.longitude * RAD_TO_DEG << "]"
+  //         << "[y:" << measure->gnss_pos.latitude * RAD_TO_DEG << "]"
+  //         << "[z:" << measure->gnss_pos.height << "]"
+  //         << "[std_x:" << bestgnsspos_msg.longitude_std_dev() << "]"
+  //         << "[std_y:" << bestgnsspos_msg.latitude_std_dev() << "]"
+  //         << "[std_z:" << bestgnsspos_msg.height_std_dev() << "]"
+  //         << "[position_type:" << bestgnsspos_msg.sol_type() << "]";
+  // }
 
   return true;
 }
@@ -416,21 +416,31 @@ bool MeasureRepublishProcess::LidarLocalProcess(
 
   *measure = measure_data;
 
+  // if (debug_log_flag_) {
+  //   AINFO << std::setprecision(16)
+  //         << "MeasureDataRepublish Debug Log: lidarLocal msg: "
+  //         << "[time:" << measure_data.time << "]"
+  //         << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG
+  //         << "]"
+  //         << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG
+  //         << "]"
+  //         << "[z:" << measure_data.gnss_pos.height << "]"
+  //         << "[yaw:" << measure_data.gnss_att.yaw * RAD_TO_DEG
+  //         << "]"
+  //         << "[std_x:" << std::sqrt(longitude_var) << "]"
+  //         << "[std_y:" << std::sqrt(latitude_var) << "]"
+  //         << "[std_z:" << std::sqrt(height_var) << "]";
+  // }
   if (debug_log_flag_) {
     AINFO << std::setprecision(16)
-          << "MeasureDataRepublish Debug Log: lidarLocal msg: "
-          << "[time:" << measure_data.time << "]"
-          << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG
-          << "]"
-          << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG
-          << "]"
-          << "[z:" << measure_data.gnss_pos.height << "]"
-          << "[yaw:" << measure_data.gnss_att.yaw * RAD_TO_DEG
-          << "]"
-          << "[std_x:" << std::sqrt(longitude_var) << "]"
-          << "[std_y:" << std::sqrt(latitude_var) << "]"
-          << "[std_z:" << std::sqrt(height_var) << "]";
-  }
+          << "curren lidarLocal utm msg: " <<"\n"
+          << "header time:" << lidar_local_msg.header().timestamp_sec()<<"\n"
+          << "measure time:" <<  measure_data.time<<"\n"
+          << "x:" << lidar_local_msg.pose().position().x() <<"\n"
+          << "y:" << lidar_local_msg.pose().position().y() << "\n"
+          << "std_x:" << lidar_local_msg.uncertainty().position_std_dev().x() <<"\n"
+          << "std_y:" << lidar_local_msg.uncertainty().position_std_dev().y() <<"\n";
+  } 
 
   return true;
 }
