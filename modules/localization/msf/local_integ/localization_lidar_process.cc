@@ -61,7 +61,8 @@ LocalizationLidarProcess::LocalizationLidarProcess()
       imu_lidar_max_delay_time_(0.5),
       is_unstable_reset_(true),
       unstable_count_(0),
-      unstable_threshold_(0.08),
+      //unstable_threshold_(0.08),
+       unstable_threshold_(0.3),
       out_map_count_(0),
       forcast_integ_state_(ForcastState::NOT_VALID),
       forcast_timer_(-1) {}
@@ -344,8 +345,18 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
     lidar_status_ = LidarState::OK;
 
     // check covariance
-    double cur_location_std_area = std::sqrt(location_covariance_(0, 0)) *
-                                   std::sqrt(location_covariance_(1, 1));
+    //double cur_location_std_area = std::sqrt(location_covariance_(0, 0)) *
+                                   //std::sqrt(location_covariance_(1, 1));
+
+    double local_uncertainty_x = std::sqrt(location_covariance_(0, 0));
+    double local_uncertainty_y = std::sqrt(location_covariance_(1, 1));
+
+    local_uncertainty_x = local_uncertainty_x > 0.1 ? local_uncertainty_x : 0.1;
+    local_uncertainty_y = local_uncertainty_y > 0.1 ? local_uncertainty_y : 0.1;
+    double cur_location_std_area =
+        std::sqrt(local_uncertainty_x * local_uncertainty_x +
+                  local_uncertainty_y * local_uncertainty_y);
+
     if (cur_location_std_area > unstable_threshold_) {
       ++unstable_count_;
     } else {
@@ -405,19 +416,19 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(const std::string& file_path,
         double qw = config["transform"]["rotation"]["w"].as<double>();
         lidar_extrinsic->linear() =
             Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
-        /*lidar_imu_quat_.x() = qx;
-        lidar_imu_quat_.y() = qy;
-        lidar_imu_quat_.z() = qz;
-        lidar_imu_quat_.w() = qw;
-        AINFO << "lidar_extrinsic_quat: " << lidar_imu_quat_.x() << " "
-        << lidar_imu_quat_.y() << " " << lidar_imu_quat_.z() << " "
-        << lidar_imu_quat_.w();
-       common::math::EulerAnglesZXYd lidar_imu_euler(lidar_imu_quat_.w(),
-                                      lidar_imu_quat_.x(),
-                                      lidar_imu_quat_.y(),
-                                      lidar_imu_quat_.z());
-        AINFO <<"from lidar_extrinsic,get lidar_imu_enler:"
-              <<lidar_imu_euler.roll()*RAD_TO_DEG << " " <<lidar_imu_euler.pitch()*RAD_TO_DEG << " " <<lidar_imu_euler.yaw()*RAD_TO_DEG <<"\n";*/
+      //   lidar_imu_quat_.x() = qx;
+      //   lidar_imu_quat_.y() = qy;
+      //   lidar_imu_quat_.z() = qz;
+      //   lidar_imu_quat_.w() = qw;
+      //   AINFO << "lidar_extrinsic_quat: " << lidar_imu_quat_.x() << " "
+      //   << lidar_imu_quat_.y() << " " << lidar_imu_quat_.z() << " "
+      //   << lidar_imu_quat_.w();
+      //  common::math::EulerAnglesZXYd lidar_imu_euler(lidar_imu_quat_.w(),
+      //                                 lidar_imu_quat_.x(),
+      //                                 lidar_imu_quat_.y(),
+      //                                 lidar_imu_quat_.z());
+      //   AINFO <<"from lidar_extrinsic,get lidar_imu_enler:"
+      //         <<lidar_imu_euler.roll()*RAD_TO_DEG << " " <<lidar_imu_euler.pitch()*RAD_TO_DEG << " " <<lidar_imu_euler.yaw()*RAD_TO_DEG <<"\n";
 
         return true;
       }
