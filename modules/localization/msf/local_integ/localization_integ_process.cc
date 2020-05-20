@@ -156,7 +156,9 @@ void LocalizationIntegProcess::GetValidFromOK() {
       && pva_covariance_[2][2] < 0.3 * 0.3
       && pva_covariance_[8][8] < 0.1 * 0.1) {
     integ_state_ = IntegState::VALID;
+    AINFO <<"inspva covariance is reasonable range!";
   }
+
   return;
 }
 
