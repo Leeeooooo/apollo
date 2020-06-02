@@ -12,8 +12,8 @@ rtk_from {
         address: "112.34.112.154"
         port: 8000
         mount_point: "NCJLXL"
-        user: "user"
-        password: "password"
+        user: "user3"
+        password: "t4tqvgqw5yq"
         timeout_s: 5
     }
     push_location: true
