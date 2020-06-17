@@ -5,26 +5,10 @@
 # 3. To override the flag values, you must set it after this file, as all Flags
 #    are evaluated strictly in order.
 
---vehicle_config_path=/apollo/modules/common/data/mkz_config.pb.txt
+--vehicle_config_path=/jmcauto/modules/common/data/vehicle_config.pb.txt
 
---log_dir=/apollo/data/log
+--log_dir=/jmcauto/data/log
 
 --use_navigation_mode=false
 
-##yandong added on NOv 26 for calibration
-
---localization_tf2_child_frame_id=novatel
-
---pointcloud_raw_topic=/apollo/sensor/velodyne16/PointCloud2
-
---velodyne_raw_topic=/apollo/sensor/velodyne16/VelodyneScanUnified
-
---pointcloud_topic=/apollo/sensor/velodyne16/compensator/PointCloud2
-
---lidar_extrinsics_file=modules/localization/msf/params/velodyne_params/velodyne16_novatel_extrinsics_example.yaml
-
---lidar_height_file=modules/localization/msf/params/velodyne_params/velodyne16_height.yaml
-
---half_vehicle_width=0.43
-
---map_dir=/apollo/modules/map/data/parking1change
+--map_dir=/jmcauto/modules/map/data/demo
