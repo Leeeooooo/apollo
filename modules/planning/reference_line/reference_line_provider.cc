@@ -32,6 +32,9 @@
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+
+#include "modules/map/pnc_map/route_segments.h"
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
@@ -574,8 +577,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
         AERROR << "Failed to update routing in pnc map";
         return false;
       }
-    }
-  }
+    }}
 
   double look_forward_distance = LookForwardDistance(vehicle_state);
   double look_backward_distance = FLAGS_look_backward_distance;
@@ -587,6 +589,15 @@ bool ReferenceLineProvider::CreateReferenceLine(
   if (is_new_routing || !FLAGS_enable_reference_line_stitching) {
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
+  //*******   new add print
+      ADEBUG<<"routing_segments_end_point:";
+      for (auto its = segments->begin(); its != segments->end();its++) {
+       
+       // ADEBUG<<GetRoutingEndPoint()->DebugString();
+      ADEBUG<< "routing segments end point:"<<(*its).RouteEndWaypoint().DebugString();        
+      }
+
+
       if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
         AERROR << "Failed to create reference line from route segments";
         reference_lines->pop_back();
@@ -595,10 +606,19 @@ bool ReferenceLineProvider::CreateReferenceLine(
         ++iter;
       }
     }
+     ///// new add print
+     ADEBUG<<"refreence_line:";
+     for (auto it = reference_lines->begin(); it != reference_lines->end();it++) {
+        ADEBUG<<"refreence_line:"<<it->DebugString();
+      }
+
     return true;
   } else {  // stitching reference line
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
+     /////***********************new 
+      ADEBUG<< "routing segments end point:"<<iter->RouteEndWaypoint().DebugString();
+
       if (!ExtendReferenceLine(vehicle_state, &(*iter),
                                &reference_lines->back())) {
         AERROR << "Failed to extend reference line";
@@ -608,6 +628,12 @@ bool ReferenceLineProvider::CreateReferenceLine(
         ++iter;
       }
     }
+    //*************************new 
+      ADEBUG<<"refreence_line else:";
+
+    for (auto it = reference_lines->begin(); it != reference_lines->end();it++) {
+        ADEBUG<<"refreence_line:"<<it->DebugString();
+      }
   }
   return true;
 }
@@ -661,11 +687,24 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   RouteSegments shifted_segments;
   std::unique_lock<std::mutex> lock(pnc_map_mutex_);
   if (!pnc_map_->ExtendSegments(*prev_segment, future_start_s, future_end_s,
-                                &shifted_segments)) {
+                                &shifted_segments)) 
+{
+                                
     lock.unlock();
     AERROR << "Failed to shift route segments forward";
     return SmoothRouteSegment(*segments, reference_line);
+    
+
+ }
+ //a           
+ if (shifted_segments.back().end_s>routing_.routing_request().waypoint(1).s())
+  {
+    //auto &back_end = shifted_segments.back();
+   shifted_segments.back().end_s=routing_.routing_request().waypoint(1).s();
+   AINFO<<"routing_.routing_request().waypoint(1).s"<<routing_.routing_request().waypoint(1).s();
+    //back_end.end_s = routing_.routing_request().waypoint(2).s();
   }
+  
   lock.unlock();
   if (prev_segment->IsWaypointOnSegment(shifted_segments.LastWaypoint())) {
     *segments = *prev_segment;
