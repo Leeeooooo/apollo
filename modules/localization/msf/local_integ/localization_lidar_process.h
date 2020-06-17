@@ -25,7 +25,7 @@
 #include <list>
 #include <string>
 #include <cstdint>
-
+#include <fstream>
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
@@ -117,6 +117,7 @@ class LocalizationLidarProcess {
                               const int64_t index_stable,
                               const double limit_min,
                               const double limit_max);
+  void CloseLogFile();
 
  private:
   // Lidar localization.
@@ -168,6 +169,7 @@ class LocalizationLidarProcess {
   static constexpr double DEG_TO_RAD = 0.017453292519943;
   static constexpr double DEG_TO_RAD2 = DEG_TO_RAD * DEG_TO_RAD;
   static constexpr double RAD_TO_DEG = 57.295779513082323;
+   std::ofstream Rawlidar_log_file_;
  // Eigen::Quaternion<double> lidar_imu_quat_;
 };
 

@@ -37,6 +37,7 @@ DECLARE_string(localization_msf_gnss_filename);
 DECLARE_string(localization_msf_lidar_filename);
 DECLARE_string(localization_pose_filename);
 DECLARE_string(localization_heading_filename);
+DECLARE_string(localization_lidar_filename);
 
 DECLARE_bool(enable_csv_log);
 DECLARE_bool(enable_gps_imu_interprolate);

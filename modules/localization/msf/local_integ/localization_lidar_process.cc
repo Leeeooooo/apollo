@@ -23,7 +23,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
 #include "modules/common/util/file.h"
-
+#include "modules/localization/common/localization_gflags.h"
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -31,6 +31,31 @@ namespace msf {
 using apollo::common::Status;
 using apollo::common::time::Timer;
 
+namespace {
+  
+  std::string GetLogFileName(const std::string& filename) {
+  time_t raw_time;
+  char name_buffer[80];
+  std::time(&raw_time);
+  std::string catalog="data/localization/";
+  std::string Refilename=catalog;
+  Refilename.append(filename.substr(18));
+  strftime(name_buffer, 80, std::strcat((char*)Refilename.c_str(),"%F_%H%M%S.csv"),
+           localtime(&raw_time));
+  return std::string(name_buffer);
+}
+
+void WriteHeaders(std::ofstream &file_stream) {
+  file_stream << "lidar_timestamp,"
+              << "x,"
+              << "y,"
+              << "z,"
+              << "roll," 
+              << "pitch,"
+              << "yaw" <<std::endl;
+
+}
+}
 LocalizationLidarProcess::LocalizationLidarProcess()
     : locator_(new LocalizationLidar()),
       pose_forcastor_(new PoseForcast()),
@@ -64,7 +89,13 @@ LocalizationLidarProcess::LocalizationLidarProcess()
       unstable_threshold_(0.08),
       out_map_count_(0),
       forcast_integ_state_(ForcastState::NOT_VALID),
-      forcast_timer_(-1) {}
+      forcast_timer_(-1) {
+      if (FLAGS_enable_csv_log) {
+       Rawlidar_log_file_.open(GetLogFileName(FLAGS_localization_lidar_filename));
+       Rawlidar_log_file_ << std::setprecision(12);
+       WriteHeaders(Rawlidar_log_file_);
+}
+}
 
 LocalizationLidarProcess::~LocalizationLidarProcess() {
   delete locator_;
@@ -72,6 +103,14 @@ LocalizationLidarProcess::~LocalizationLidarProcess() {
 
   delete pose_forcastor_;
   pose_forcastor_ = nullptr;
+  CloseLogFile();
+}
+
+void LocalizationLidarProcess::CloseLogFile() {
+  if (FLAGS_enable_csv_log && Rawlidar_log_file_.is_open()) 
+  {
+    Rawlidar_log_file_.close();
+  }
 }
 
 Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
@@ -322,6 +361,15 @@ bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
   Eigen::Translation3d transd(
       Eigen::Vector3d(forcast_pose.x, forcast_pose.y, forcast_pose.z));
   *predict_pose = transd * quatd;
+  
+  common::math::EulerAnglesZXYd lidar_euler(forcast_pose.qw,forcast_pose.qx,
+                                forcast_pose.qy,forcast_pose.qz);
+
+  if (FLAGS_enable_csv_log) {
+      Rawlidar_log_file_  <<lidar_time <<"," <<forcast_pose.x <<"," <<forcast_pose.y
+      <<"," <<forcast_pose.z <<"," <<lidar_euler.roll()*RAD_TO_DEG <<","
+      <<lidar_euler.pitch()*RAD_TO_DEG << " " <<lidar_euler.yaw()*RAD_TO_DEG <<"\n";
+  }
 
   if (state == 0) {
     *forcast_state = ForcastState::INITIAL;

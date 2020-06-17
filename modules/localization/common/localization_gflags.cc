@@ -50,7 +50,10 @@ DEFINE_string(localization_pose_filename,
 
 DEFINE_string(localization_heading_filename,
               "data/localization/heading",
-              "save localizaton heading data");           
+              "save localizaton heading data");
+DEFINE_string(localization_lidar_filename,
+              "data/localization/raw_lidar",
+               "save localizaton raw lidar data");           
 
 // features
 DEFINE_bool(enable_csv_log, true, "True to write out csv debug file.");
