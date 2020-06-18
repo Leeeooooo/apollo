@@ -414,7 +414,7 @@ void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
                                            resolution_id, zone_id);
     map_ids.insert(map_id);
   }
-
+  AINFO <<location[0]<<":" <<" preload node part has got node index.";
   this->PreloadMapNodes(&map_ids);
   return;
 }
@@ -439,7 +439,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   MapNodeIndex map_id = MapNodeIndex::GetMapNodeIndex(
       *(this->map_config_), pt_top_left, resolution_id, zone_id);
   map_ids.insert(map_id);
-
+   AINFO <<seed_pt3d[0]<<":" <<"top left  has got node index.";
   /// top center
   Eigen::Vector3d pt_top_center;
   pt_top_center[0] = seed_pt3d[0];
@@ -448,7 +448,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_top_center,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
-
+   AINFO <<seed_pt3d[0]<<":" <<"top center  has got node index.";
   /// top right
   Eigen::Vector3d pt_top_right;
   pt_top_right[0] = seed_pt3d[0] + (this->map_config_->map_node_size_x_ *
@@ -459,7 +459,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_top_right,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
-
+   AINFO <<seed_pt3d[0]<<":" <<"top right  has got node index.";
   /// middle left
   Eigen::Vector3d pt_middle_left;
   pt_middle_left[0] = pt_top_left[0];
@@ -468,11 +468,12 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_middle_left,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
-
+  AINFO <<seed_pt3d[0]<<":" <<"middle left  has got node index.";
   /// middle center
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), seed_pt3d,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
+  AINFO <<seed_pt3d[0]<<":" <<"middle center  has got node index.";
 
   /// middle right
   Eigen::Vector3d pt_middle_right;
@@ -482,6 +483,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_middle_right,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
+  AINFO <<seed_pt3d[0]<<":" <<"middle right  has got node index.";
 
   /// bottom left
   Eigen::Vector3d pt_bottom_left;
@@ -494,6 +496,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_bottom_left,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
+  AINFO <<seed_pt3d[0]<<":" <<"bottom left  has got node index.";
 
   /// bottom center
   Eigen::Vector3d pt_bottom_center;
@@ -503,6 +506,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_bottom_center,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
+  AINFO <<seed_pt3d[0]<<":" <<"bottom center  has got node index.";
 
   /// bottom right
   Eigen::Vector3d pt_bottom_right;
@@ -512,6 +516,7 @@ bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
   map_id = MapNodeIndex::GetMapNodeIndex(*(this->map_config_), pt_bottom_right,
                                          resolution_id, zone_id);
   map_ids.insert(map_id);
+  AINFO <<seed_pt3d[0]<<":" <<"bottom right  has got node index.";
 
   this->LoadMapNodes(&map_ids);
   return true;

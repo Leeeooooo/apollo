@@ -240,8 +240,8 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
                              lidar_frame);
   AINFO << "lidar computer result is: " << ret;
   UpdateState(ret, lidar_frame.measurement_time);
-
-  timer.End("Lidar process");
+ AINFO <<"current lidar_frame compute process finish. ";
+ // timer.End("Lidar process");
 }
 
 void LocalizationLidarProcess::GetResult(int* lidar_status,

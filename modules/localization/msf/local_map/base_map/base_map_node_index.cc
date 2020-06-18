@@ -92,6 +92,10 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
   int m = static_cast<int>(
       (coordinate[1] - option.map_range_.GetMinY()) /
       (option.map_node_size_y_ * option.map_resolutions_[resolution_id]));
+  AINFO << coordinate[0] <<":the easting direction node range is :" <<n<<"\n";
+  AINFO << coordinate[1] <<":the northing direction node range is :" <<m<<"\n";
+  AINFO <<"raw map east node range is:" <<static_cast<int>(GetMapIndexRangeEast(option, resolution_id))<<"\n";
+  AINFO <<"raw map north node range is:" <<static_cast<int>(GetMapIndexRangeNorth(option, resolution_id))<<"\n";
   if (n >= 0 && m >= 0 &&
       n < static_cast<int>(GetMapIndexRangeEast(option, resolution_id)) &&
       m < static_cast<int>(GetMapIndexRangeNorth(option, resolution_id))) {
